@@ -9,6 +9,8 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(ggplot2)
+library(maps)
+library(mapproj)
 ```
 
 ## 3.2.4 Exercises
@@ -277,50 +279,172 @@ ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) +
 
 ###1. What is the default geom associated with `stat_summary()`? How could you rewrite the previous plot to use that geom function instead of the stat function?
 
+The default geom associated with `stat_summary()` is `geom_pointrange()`. 
+
+Rewritten:
+```{r}
+ggplot(data = diamonds) + 
+  geom_pointrange(mapping = aes(x = cut, y = depth),
+    stat = "summary",
+    fun.ymin = min,
+    fun.ymax = max,
+    fun.y = median
+  )
+```
+
 ###2. What does `geom_col()` do? How is it different to `geom_bar()`?
+
+`geom_col()` and `geom_bar()` both create bar charts, but with `geom_bar()` the height of the bar is proportional to the number of cases in each group (uses `stat_count` to count the number of cases at each x position), whereas with `geom_col()` the heights of the bars are themselves values in the data (no counting necessary - uses `stat_identity`).
 
 ###3. Most geoms and stats come in pairs that are almost always used in concert. Read through the documentation and make a list of all the pairs. What do they have in common?
 
+`geom_abline` and `stat_abline`, `geom_hline` and `stat_hline`, `geom_vline` and `stat_vline`, etc... Most geom and stat pairs have similar names. 
+
 ###4. What variables does `stat_smooth()` compute? What parameters control its behaviour?
+
+`stat_smooth()` computes `y` (predicted value), `ymin` (lower pointwise confidence interval around the mean), `ymax` (upper pointwise confidence interval around the mean), and `se` (standard error). Many parameters control its behavior, including `method` (which defines the smoothing method to use), `se` (which defines whether or not to display a confidence interval), and `level` (which defines the level of confidence interval to use). 
 
 ###5. In our proportion bar chart, we need to set `group = 1`. Why? In other words what is the problem with these two graphs?
 
-```
+Without `group = 1`:
+```{r}
 ggplot(data = diamonds) + 
   geom_bar(mapping = aes(x = cut, y = ..prop..))
 ```
-```
+
+```{r}
 ggplot(data = diamonds) + 
   geom_bar(mapping = aes(x = cut, fill = color, y = ..prop..))
 ```
+
+We need to set `group = 1` to specify that all of the data should be regarded as one group. Otherwise, each cut is considered a separate group and we get proportions of 1 everywhere.
+
+With `group = 1`:
+```{r}
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = cut, y = ..prop.., group = 1))
+```
+
+```{r}
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = cut, fill = color, y = ..prop.., group = 1))
+```
+
 ## 3.8.1 Exercises
 
 ###1. What is the problem with this plot? How could you improve it?
 
-```
+```{r}
 ggplot(data = mpg, mapping = aes(x = cty, y = hwy)) + 
   geom_point()
 ```
 
+Many points appear to overlap each other (overplotting). You could improve the plot by adding jitter, which will add a small amount of random noise to each point. 
+
+```{r}
+ggplot(data = mpg, mapping = aes(x = cty, y = hwy)) + 
+  geom_point() + 
+  geom_jitter()
+```
+
 ###2. What parameters to `geom_jitter()` control the amount of jittering?
+
+`width` and `height` control the amount of jittering. 
+
+```{r}
+ggplot(data = mpg, mapping = aes(x = cty, y = hwy)) + 
+  geom_point() + 
+  geom_jitter(width = 5, height = 10)
+```
 
 ###3. Compare and contrast `geom_jitter()` with `geom_count()`.
 
+Both `geom_jitter()` and `geom_count()` are used to manage overplotting. While `geom_jitter()` adds a small amount of random noise to the location of each point, `geom_count()` counts the number of observations at each location, mapping count to point area.
+
+```{r}
+ggplot(data = mpg, mapping = aes(x = cty, y = hwy)) + 
+  geom_point() + 
+  geom_jitter()
+```
+
+```{r}
+ggplot(data = mpg, mapping = aes(x = cty, y = hwy)) + 
+  geom_point() + 
+  geom_count()
+```
+
 ###4. What’s the default position adjustment for `geom_boxplot()`? Create a visualisation of the `mpg` dataset that demonstrates it.
+
+The default for `geom_boxplot()` is `position_dodge`. 
+
+```{r}
+ggplot(data = mpg, mapping = aes(x = drv, y = hwy, color = class)) +
+  geom_boxplot()
+```
+
+Looks the same: 
+```{r}
+ggplot(data = mpg, mapping = aes(x = drv, y = hwy, color = class)) +
+  geom_boxplot(position = "dodge")
+```
+
+Do not look the same:
+```{r}
+ggplot(data = mpg, mapping = aes(x = drv, y = hwy, color = class)) +
+  geom_boxplot(position = "jitter")
+```
+
+```{r}
+ggplot(data = mpg, mapping = aes(x = drv, y = hwy, color = class)) +
+  geom_boxplot(position = "identity")
+```
 
 ## 3.9.1 Exercises
 
 ###1. Turn a stacked bar chart into a pie chart using `coord_polar()`.
 
+```{r}
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = cut, fill = clarity), width = 1)
+```
+
+```{r}
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = cut, fill = clarity), width = 1) +
+  coord_polar()
+```
+
 ###2. What does `labs()` do? Read the documentation.
+
+`labs()` is used to change axis labels and legend titles. 
 
 ###3. What’s the difference between `coord_quickmap()` and `coord_map()`?
 
+`coord_quickmap` is a quick approximation that preserves straight lines, while `coord_map` does not preserve straight lines and thus generally requires more computation. 
+
+```{r}
+nz <- map_data("nz")
+
+ggplot(nz, aes(long, lat, group = group)) +
+  geom_polygon(fill = "white", colour = "black") +
+  coord_map()
+```
+  
+```{r}
+nz <- map_data("nz")
+
+ggplot(nz, aes(long, lat, group = group)) +
+  geom_polygon(fill = "white", colour = "black") +
+  coord_quickmap()
+```
+
 ###4. What does the plot below tell you about the relationship between city and highway mpg? Why is `coord_fixed()` important? What does `geom_abline()` do?
 
-```
+```{r}
 ggplot(data = mpg, mapping = aes(x = cty, y = hwy)) +
   geom_point() + 
   geom_abline() +
   coord_fixed()
 ```
+
+There is a positive correlation between city and highway mpg. `coord_fixed()` ensures that one unit on the x axis is the same length as one unit on the y axis, thus the x and y values are directly comparable. `geom_abline()` adds a reference line to the plot (default values: intercept = 0, slope = 1). 
