@@ -142,6 +142,7 @@ ggplot(data = mpg) +
   geom_point(mapping = aes(x = displ, y = hwy)) + 
   facet_wrap(~ cty, nrow = 3)
 ```
+
 There will be a subplot displayed for each unique value of the continuous variable (the number of subplots displayed can potentially be very large). 
 
 ###2. What do the empty cells in plot with `facet_grid(drv ~ cyl)` mean? How do they relate to this plot?
@@ -323,11 +324,6 @@ With `group = 1`:
 ```{r}
 ggplot(data = diamonds) + 
   geom_bar(mapping = aes(x = cut, y = ..prop.., group = 1))
-```
-
-```{r}
-ggplot(data = diamonds) + 
-  geom_bar(mapping = aes(x = cut, fill = color, y = ..prop.., group = 1))
 ```
 
 ## 3.8.1 Exercises
