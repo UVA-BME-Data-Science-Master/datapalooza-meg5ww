@@ -449,7 +449,7 @@ ggplot(data = diamonds) +
   geom_histogram(mapping = aes(z), binwidth = 0.5)
 ```
 
-The distribution of the `x` variable is between 3.5 and 9 for the most part, while the distribution of the `y` variable is generally between 5 and 10, and the distribution of the `z` variable is generally between 2.5 and 5 (although there are a few outliers in the `y` and `z` variables). The `x` and `y` variables are likely length and width since they have similar distribution domains, while the 'z' variable is likely depth. 
+The distribution of the `x` variable is between 3.5 and 9 for the most part, while the distribution of the `y` variable is generally between 5 and 10, and the distribution of the `z` variable is generally between 2.5 and 5 (although there are a few outliers in the `y` and `z` variables). The `x` and `y` variables are likely length and width since they have similar distribution domains, while the `z` variable is likely depth. 
 
 ###2. Explore the distribution of `price`. Do you discover anything unusual or surprising? (Hint: Carefully think about the `binwidth` and make sure you try a wide range of values.)
 
