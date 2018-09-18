@@ -534,7 +534,7 @@ graph2 <- dm_create_graph(dm2, rankdir = "LR", columnArrows = TRUE)
 dm_render_graph(graph2)
 ```
 
-`Batting` and `Master` can be matched by playerID. `Salary` can then be matched with 'Batting` by playerID and yearID. `Master` and `Managers` can be matched by playerID. `Managers` and `AwardsManagers` can be matched by playerID and yearID.
+`Batting` and `Master` can be matched by playerID. `Salary` can then be matched with `Batting` by playerID and yearID. `Master` and `Managers` can be matched by playerID. `Managers` and `AwardsManagers` can be matched by playerID and yearID.
 
 `Batting`, `Pitching`, and `Fielding` all have a primary key of playerID, yearID, and stint, and have a one-to-one relationship to each other. 
 
