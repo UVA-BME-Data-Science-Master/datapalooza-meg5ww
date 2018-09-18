@@ -500,7 +500,8 @@ There is no primary key for ggplot2::diamonds. The number of distinct rows in th
 
 ###3. Draw a diagram illustrating the connections between the `Batting`, `Master`, and `Salaries` tables in the Lahman package. Draw another diagram that shows the relationship between `Master`, `Managers`, `AwardsManagers`. How would you characterise the relationship between the `Batting`, `Pitching`, and `Fielding` tables?
 
-```{r, error = TRUE}
+```{r}
+library(datamodelr)
 dm1 <- dm_from_data_frames(list(Batting = Lahman::Batting,
                                 Master = Lahman::Master,
                                 Salaries = Lahman::Salaries)) %>%
@@ -512,10 +513,12 @@ dm1 <- dm_from_data_frames(list(Batting = Lahman::Batting,
     Salaries$playerID == Master$playerID
   )
 
-dm_create_graph(dm1, rankdir = "LR", columnArrows = TRUE)
+graph1 <- dm_create_graph(dm1, rankdir = "LR", columnArrows = TRUE)
+dm_render_graph(graph1)
 ```
 
-```{r, error = TRUE}
+```{r}
+library(datamodelr)
 dm2 <- dm_from_data_frames(list(Master = Lahman::Master,
                                 Managers = Lahman::Managers,
                                 AwardsManagers = Lahman::AwardsManagers)) %>%
@@ -527,7 +530,8 @@ dm2 <- dm_from_data_frames(list(Master = Lahman::Master,
     AwardsManagers$playerID == Master$playerID
   )
 
-dm_create_graph(dm2, rankdir = "LR", columnArrows = TRUE)
+graph2 <- dm_create_graph(dm2, rankdir = "LR", columnArrows = TRUE)
+dm_render_graph(graph2)
 ```
 
 `Batting` and `Master` can be matched by playerID. `Salary` can then be matched with 'Batting` by playerID and yearID. `Master` and `Managers` can be matched by playerID. `Managers` and `AwardsManagers` can be matched by playerID and yearID.
