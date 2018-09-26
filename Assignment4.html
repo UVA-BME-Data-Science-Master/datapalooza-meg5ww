@@ -136,7 +136,7 @@ $(document).ready(function () {
 <h2>19.2.1 Practice</h2>
 <div id="why-is-true-not-a-parameter-to-rescale01-what-would-happen-if-x-contained-a-single-missing-value-and-na.rm-was-false" class="section level3">
 <h3>1. Why is <code>TRUE</code> not a parameter to <code>rescale01()</code>? What would happen if <code>x</code> contained a single missing value, and <code>na.rm</code> was <code>FALSE</code>?</h3>
-<p><code>TRUE</code> is not a parameter to <code>rescale01()</code> because we don’t want it to be a parameter of a function that the user can change. If <code>x</code> containes a missing value and <code>na.rm</code> is <code>FALSE</code> then the output vector will have an NA value.</p>
+<p><code>TRUE</code> is not a parameter to <code>rescale01()</code> because we don’t want it to be a parameter of a function that the user can change. If <code>x</code> contains a missing value and <code>na.rm</code> is <code>FALSE</code> then the output vector will have an NA value.</p>
 </div>
 <div id="in-the-second-variant-of-rescale01-infinite-values-are-left-unchanged.-rewrite-rescale01-so-that--inf-is-mapped-to-0-and-inf-is-mapped-to-1." class="section level3">
 <h3>2. In the second variant of <code>rescale01()</code>, infinite values are left unchanged. Rewrite <code>rescale01()</code> so that -<code>Inf</code> is mapped to 0, and <code>Inf</code> is mapped to 1.</h3>
@@ -176,16 +176,16 @@ coeff_var &lt;- function(x) {
   sum_of_squares &lt;- sum(diff_from_mean^2, rm.na = TRUE)
   return(sum_of_squares/(sum(!is.na(x)) - 1))
 }
-variance(c(1,10,9,2))</code></pre>
-<pre><code>## [1] 22</code></pre>
+variance(c(1,10,12,2))</code></pre>
+<pre><code>## [1] 31.25</code></pre>
 <pre class="r"><code>skewness &lt;- function(x) {
   diff_from_mean &lt;- (x - mean(x, rm.na = TRUE))
   third_moment &lt;- sum(diff_from_mean^3, na.rm = TRUE)
   std_cubed &lt;- sum(diff_from_mean^2, na.rm = TRUE)^(3/2)/sqrt(sum(!is.na(x)))
   return(third_moment/std_cubed)
 }
-skewness(c(1,10,9,2))</code></pre>
-<pre><code>## [1] 0</code></pre>
+skewness(c(1,10,12,2))</code></pre>
+<pre><code>## [1] 0.04785918</code></pre>
 </div>
 <div id="write-both_na-a-function-that-takes-two-vectors-of-the-same-length-and-returns-the-number-of-positions-that-have-an-na-in-both-vectors." class="section level3">
 <h3>5. Write <code>both_na()</code>, a function that takes two vectors of the same length and returns the number of positions that have an <code>NA</code> in both vectors.</h3>
@@ -201,7 +201,7 @@ both_na(c(1,NA,NA,NA,5), c(1,NA,7,NA,NA))</code></pre>
 <h3>6. What do the following functions do? Why are they useful even though they are so short?</h3>
 <pre class="r"><code>is_directory &lt;- function(x) file.info(x)$isdir
 is_readable &lt;- function(x) file.access(x, 4) == 0</code></pre>
-<p><code>is_directory()</code> returns <code>TRUE</code> if <code>x</code> is a directory, and <code>FALSE</code> otherwise. <code>is_readable()</code> returns returns <code>TRUE</code> if a file can be read. They are useful because their function names reveal more about their function than the actual code.</p>
+<p><code>is_directory()</code> returns <code>TRUE</code> if <code>x</code> is a directory and <code>FALSE</code> otherwise. <code>is_readable()</code> returns <code>TRUE</code> if a file can be read. They are useful because their function names reveal more about their function than the actual code.</p>
 </div>
 <div id="read-the-complete-lyrics-to-little-bunny-foo-foo.-theres-a-lot-of-duplication-in-this-song.-extend-the-initial-piping-example-to-recreate-the-complete-song-and-use-functions-to-reduce-the-duplication." class="section level3">
 <h3>7. Read the complete lyrics to “Little Bunny Foo Foo”. There’s a lot of duplication in this song. Extend the initial piping example to recreate the complete song, and use functions to reduce the duplication.</h3>
@@ -306,7 +306,7 @@ f3 &lt;- function(x, y) {
 </div>
 <div id="take-a-function-that-youve-written-recently-and-spend-5-minutes-brainstorming-a-better-name-for-it-and-its-arguments." class="section level3">
 <h3>2. Take a function that you’ve written recently and spend 5 minutes brainstorming a better name for it and its arguments.</h3>
-<p>Function: analyze_f3, better name would be analyze_pop Arguments: target population, could call this pop_target</p>
+<p>Function: analyze_f3, better name would be analyze_pop. Arguments: target population, could call this pop_target.</p>
 </div>
 <div id="compare-and-contrast-rnorm-and-massmvrnorm.-how-could-you-make-them-more-consistent" class="section level3">
 <h3>3. Compare and contrast <code>rnorm()</code> and <code>MASS::mvrnorm()</code>. How could you make them more consistent?</h3>
@@ -401,7 +401,7 @@ fizzbuzz(9)</code></pre>
 <pre><code>## [1] &quot;No&quot;</code></pre>
 <pre class="r"><code>switch(2, &quot;No&quot;, &quot;Yes&quot;, &quot;Maybe&quot;)</code></pre>
 <pre><code>## [1] &quot;Yes&quot;</code></pre>
-<p>If you use <code>switch() with numeric values (as in</code>switch(n, …)`), then it will return the nth argument in …, as shown above.</p>
+<p>If you use <code>switch()</code> with numeric values (as in <code>switch(n, ...)</code>), then it will return the nth argument in …, as shown above.</p>
 </div>
 <div id="what-does-this-switch-call-do-what-happens-if-x-is-e" class="section level3">
 <h3>6. What does this <code>switch()</code> call do? What happens if x is “e”?</h3>
@@ -453,7 +453,7 @@ commas(letters, collapse = &quot;-&quot;)</code></pre>
 </div>
 <div id="itd-be-nice-if-you-could-supply-multiple-characters-to-the-pad-argument-e.g.-ruletitle-pad--.-why-doesnt-this-currently-work-how-could-you-fix-it" class="section level3">
 <h3>2. It’d be nice if you could supply multiple characters to the <code>pad</code> argument, e.g. <code>rule(&quot;Title&quot;, pad = &quot;-+&quot;)</code>. Why doesn’t this currently work? How could you fix it?</h3>
-<p>This doesn’t current work because the original <code>rule</code> function copies the <code>pad</code> argument a very specific number of times (equal to the desired width minus the length of the title and five extra characters) - if <code>pad</code> is 2 characters rather than 1 then the output is almost twice as long.</p>
+<p>This doesn’t currently work because the original <code>rule</code> function copies the <code>pad</code> argument a very specific number of times (equal to the desired width minus the length of the title and five extra characters) - if <code>pad</code> is 2 characters rather than 1 then the output is almost twice as long.</p>
 <p>Original:</p>
 <pre class="r"><code>rule &lt;- function(..., pad = &quot;-&quot;) {
   title &lt;- paste0(...)
@@ -776,20 +776,20 @@ for (i in seq_along(normals)) {
 }
 normals</code></pre>
 <pre><code>## [[1]]
-##  [1] -11.221991 -11.152831 -10.642831 -11.339251 -10.380082  -8.744650
-##  [7]  -9.539019  -9.141978  -9.161192  -8.449461
+##  [1]  -9.441466 -11.280660  -9.985216 -10.636493  -8.956157  -8.679610
+##  [7]  -9.626931 -10.352741 -10.137817 -10.748788
 ## 
 ## [[2]]
-##  [1]  0.21570156 -0.26927051  0.01023254 -1.04795158  0.32530329
-##  [6] -1.89242000  0.01680152 -1.12683107 -1.31429899 -1.14473540
+##  [1] -0.55851553 -0.09162949 -1.09699337  0.18345295 -0.46241406
+##  [6] -0.06587905 -0.92140001 -0.56890663 -1.92824035  1.64510781
 ## 
 ## [[3]]
-##  [1] 11.741454  8.573556 11.445536  9.995844 11.373196 11.053874  8.437473
-##  [8] 10.449697  9.344736 10.731776
+##  [1] 10.172696 12.566999  8.161949 10.366412 10.181025 10.586571 10.886820
+##  [8]  9.810796 11.014485 10.574149
 ## 
 ## [[4]]
-##  [1]  99.42039  99.82755  98.94403  99.03671  99.16182  98.37098  99.95914
-##  [8]  99.78765 100.34647 100.96656</code></pre>
+##  [1] 101.17255  99.99888 100.29682 100.90236  98.06835 100.06888 100.67366
+##  [8]  99.59091  98.89589  96.22406</code></pre>
 </div>
 <div id="eliminate-the-for-loop-in-each-of-the-following-examples-by-taking-advantage-of-an-existing-function-that-works-with-vectors" class="section level3">
 <h3>2. Eliminate the for loop in each of the following examples by taking advantage of an existing function that works with vectors:</h3>
@@ -798,22 +798,42 @@ out &lt;- &quot;&quot;
 for (x in letters) {
   out &lt;- stringr::str_c(out, x)
 }
-
-# 2) 
+out</code></pre>
+<pre><code>## [1] &quot;abcdefghijklmnopqrstuvwxyz&quot;</code></pre>
+<pre class="r"><code># 2) 
 x &lt;- sample(100)
 sd &lt;- 0
 for (i in seq_along(x)) {
   sd &lt;- sd + (x[i] - mean(x)) ^ 2
 }
 sd &lt;- sqrt(sd / (length(x) - 1))
-
-# 3) 
+sd</code></pre>
+<pre><code>## [1] 29.01149</code></pre>
+<pre class="r"><code># 3) 
 x &lt;- runif(100)
 out &lt;- vector(&quot;numeric&quot;, length(x))
 out[1] &lt;- x[1]
 for (i in 2:length(x)) {
   out[i] &lt;- out[i - 1] + x[i]
-}</code></pre>
+}
+out</code></pre>
+<pre><code>##   [1]  0.5988499  1.5393385  1.7126931  2.3822233  2.7220822  3.7002465
+##   [7]  4.5378838  5.5310281  5.9310996  6.0683682  6.4792985  7.4667619
+##  [13]  7.6181090  7.9146698  8.0813977  8.7946985  9.3730104  9.7415099
+##  [19] 10.0031204 10.2300279 10.7504848 11.0846735 11.4993574 12.0757830
+##  [25] 12.3300530 13.1595077 13.3217774 14.1866775 14.5379333 14.5494055
+##  [31] 14.7303803 15.3423128 16.2308272 16.4604262 17.4429127 18.0754960
+##  [37] 18.4325746 19.0029749 19.6197592 20.1730070 20.4955513 20.7336523
+##  [43] 21.3835613 21.8979558 22.3853843 23.0775273 23.5306211 23.9390821
+##  [49] 24.3114033 24.8550318 25.5026311 26.3845687 27.0218485 27.7199348
+##  [55] 27.8078257 28.3607074 28.5661446 28.8068327 29.0026989 29.5960675
+##  [61] 30.3253076 31.0245570 31.9844629 32.7462125 33.6599049 34.1173524
+##  [67] 34.3677817 35.2257916 35.8808384 36.7666104 37.6997484 38.2078178
+##  [73] 38.8959381 39.2914642 39.9535241 40.5270097 40.8609207 41.5813342
+##  [79] 42.4695841 42.6449310 42.6713715 42.8435581 43.5006120 44.4154907
+##  [85] 44.6546424 45.2935780 45.6022447 45.6579277 46.5359112 47.2803148
+##  [91] 48.0436595 48.9101125 49.5211062 50.4549274 51.0084890 51.2604454
+##  [97] 51.9690899 52.0334754 52.9636375 53.1596229</code></pre>
 <ol style="list-style-type: decimal">
 <li></li>
 </ol>
@@ -822,13 +842,31 @@ for (i in 2:length(x)) {
 <ol start="2" style="list-style-type: decimal">
 <li></li>
 </ol>
-<pre class="r"><code>sd(x)</code></pre>
-<pre><code>## [1] 0.2585804</code></pre>
+<pre class="r"><code>x &lt;- sample(100)
+sd(x)</code></pre>
+<pre><code>## [1] 29.01149</code></pre>
 <ol start="3" style="list-style-type: decimal">
 <li></li>
 </ol>
-<pre class="r"><code>all.equal(cumsum(x),out)</code></pre>
-<pre><code>## [1] TRUE</code></pre>
+<pre class="r"><code>x &lt;- runif(100)
+cumsum(x)</code></pre>
+<pre><code>##   [1]  0.9408839  1.0539824  2.0252742  2.5610731  3.3829579  3.3939465
+##   [7]  3.4096772  3.5972565  3.9163755  4.3992952  4.8300783  5.5225916
+##  [13]  5.8624987  5.9122008  6.0051527  6.7347012  7.0440094  7.6115206
+##  [19]  8.3978830  8.6786213  9.0386053  9.1182204  9.3922304  9.4989410
+##  [25] 10.2062573 11.1004650 11.5865406 12.0081732 12.7716850 12.9049934
+##  [31] 13.1790284 13.5989757 14.1264246 14.4460189 14.6694547 15.3377629
+##  [37] 16.0905743 16.5577884 16.5997978 17.5535108 18.4185094 18.5316158
+##  [43] 19.4561121 19.8496400 20.2294239 20.2669653 20.9125745 21.0717566
+##  [49] 21.3318175 21.7484266 22.6513346 23.3052125 23.9009292 24.3042542
+##  [55] 25.2800455 25.9734806 26.3572273 26.9669328 27.3365267 27.4159056
+##  [61] 27.7184858 28.3790987 28.9826100 29.4148630 29.4181651 29.9015695
+##  [67] 30.1026968 30.8020582 31.3797954 31.3930404 31.3998601 32.0176208
+##  [73] 32.5060203 32.8849641 33.5493687 34.0382433 34.7963809 35.3928669
+##  [79] 35.7155584 36.3362542 36.4628699 36.7621195 37.5237972 37.5704529
+##  [85] 38.2789938 38.7776859 38.9434806 39.5648075 40.3730593 40.5895550
+##  [91] 41.4793810 42.1892987 42.7331956 43.0524484 43.3333003 43.3351716
+##  [97] 43.6450541 44.1760551 44.8203379 44.9682270</code></pre>
 </div>
 <div id="combine-your-function-writing-and-for-loop-skills-1-write-a-for-loop-that-prints-the-lyrics-to-the-childrens-song-alice-the-camel.-2-convert-the-nursery-rhyme-ten-in-the-bed-to-a-function.-generalise-it-to-any-number-of-people-in-any-sleeping-structure.-3-convert-the-song-99-bottles-of-beer-on-the-wall-to-a-function.-generalise-to-any-number-of-any-vessel-containing-any-liquid-on-any-surface." class="section level3">
 <h3>3. Combine your function writing and for loop skills: 1) Write a for loop that <code>prints()</code> the lyrics to the children’s song “Alice the camel”. 2) Convert the nursery rhyme “ten in the bed” to a function. Generalise it to any number of people in any sleeping structure. 3) Convert the song “99 bottles of beer on the wall” to a function. Generalise to any number of any vessel containing any liquid on any surface.</h3>
@@ -1004,8 +1042,8 @@ output</code></pre>
 }
 microbenchmark(non_allocate(10000), times = 10)</code></pre>
 <pre><code>## Unit: milliseconds
-##                 expr      min       lq     mean   median       uq     max
-##  non_allocate(10000) 176.0753 179.7756 194.7385 189.0278 190.0328 251.306
+##                 expr      min       lq     mean  median       uq     max
+##  non_allocate(10000) 166.2248 169.9118 185.5788 181.315 188.8407 241.181
 ##  neval
 ##     10</code></pre>
 <p>With preallocation:</p>
@@ -1019,7 +1057,7 @@ microbenchmark(non_allocate(10000), times = 10)</code></pre>
 microbenchmark(allocate(10000), times = 10)</code></pre>
 <pre><code>## Unit: milliseconds
 ##             expr      min       lq     mean   median       uq      max
-##  allocate(10000) 6.653275 6.768826 7.819644 7.359554 8.888217 9.942315
+##  allocate(10000) 6.591172 7.134392 8.391628 8.315871 9.253837 11.30975
 ##  neval
 ##     10</code></pre>
 <p>Loops that preallocate the output run much faster.</p>
@@ -1224,20 +1262,20 @@ col_summary(iris)</code></pre>
 </ol>
 <pre class="r"><code>map(c(-10, 0, 10, 100), ~ rnorm(n = 10, mean = .))</code></pre>
 <pre><code>## [[1]]
-##  [1] -10.616328 -10.518649  -9.149984  -9.076953  -9.104721 -10.387816
-##  [7] -10.937501  -9.700864 -10.765774  -8.649061
+##  [1] -10.498476  -7.958647  -9.923879  -9.350157 -11.203245  -8.852508
+##  [7] -11.321662 -10.377710  -8.556311 -10.349295
 ## 
 ## [[2]]
-##  [1]  0.6781043  0.2452062  1.1684338 -0.2739951 -2.2944135  0.4758131
-##  [7]  2.7362609 -0.3751277 -0.1881590 -0.1856782
+##  [1] -0.2679194  0.7503418 -2.4202049 -0.2795463 -2.3175119  0.3006600
+##  [7] -0.2994569 -0.1327074  0.4585322  0.9943150
 ## 
 ## [[3]]
-##  [1]  9.042934  8.721421 10.438978  9.711390 11.582696  8.091051  9.176881
-##  [8] 10.295068  8.827852  8.017281
+##  [1]  8.642762 11.088917 10.142365 10.907140  9.498273  9.581188  9.484075
+##  [8] 10.509895  9.918316  8.366754
 ## 
 ## [[4]]
-##  [1]  98.50791 100.51922 100.95945 100.98802 101.93181 101.00144 100.04852
-##  [8] 100.84102 100.66602 100.07619</code></pre>
+##  [1]  98.62661  99.67109 100.93621  99.29925  99.01066  99.48367 100.77843
+##  [8] 101.10969 100.68043 101.67924</code></pre>
 </div>
 <div id="how-can-you-create-a-single-vector-that-for-each-column-in-a-data-frame-indicates-whether-or-not-its-a-factor" class="section level3">
 <h3>2. How can you create a single vector that for each column in a data frame indicates whether or not it’s a factor?</h3>
@@ -1250,38 +1288,38 @@ col_summary(iris)</code></pre>
 <pre class="r"><code>x &lt;- map(1:5, runif)
 x</code></pre>
 <pre><code>## [[1]]
-## [1] 0.5310521
+## [1] 0.5513507
 ## 
 ## [[2]]
-## [1] 0.9996139 0.5259842
+## [1] 0.6983527 0.2254573
 ## 
 ## [[3]]
-## [1] 0.71885311 0.09843023 0.59259317
+## [1] 0.0265623 0.9110533 0.9068626
 ## 
 ## [[4]]
-## [1] 0.4634178 0.7067907 0.1971132 0.6742331
+## [1] 0.3570377 0.3545317 0.4143352 0.9154181
 ## 
 ## [[5]]
-## [1] 0.638827222 0.144581750 0.126137174 0.003655903 0.584856837</code></pre>
+## [1] 0.1353142 0.5379768 0.1793350 0.5995527 0.2692308</code></pre>
 <p>When you use map functions on vectors that aren’t lists, then they still iterate over the vector elements. <code>map(1:5, runif)</code> is equivalent to running runif(1), runif(2), …, runif(5), and then collecting the results in a list (end up with a list with five numeric vectors inside of it ranging from size 1 to size 5).</p>
 </div>
 <div id="what-does-map-22-rnorm-n-5-do-why-what-does-map_dbl-22-rnorm-n-5-do-why" class="section level3">
 <h3>4. What does <code>map(-2:2, rnorm, n = 5)</code> do? Why? What does <code>map_dbl(-2:2, rnorm, n = 5)</code> do? Why?</h3>
 <pre class="r"><code>map(-2:2, rnorm, n = 5)</code></pre>
 <pre><code>## [[1]]
-## [1] -1.9722530 -0.3554618 -1.5896679 -2.3375965 -1.3941721
+## [1] -2.177175 -1.324815 -2.170683 -1.879345 -2.037739
 ## 
 ## [[2]]
-## [1] -1.9342551 -0.7307493 -0.2004271 -1.0373316 -1.0197705
+## [1] -0.9838329 -1.1733771 -1.9262037 -2.2187200 -0.4383337
 ## 
 ## [[3]]
-## [1] -0.07717451 -1.65606663 -0.08107937 -0.93535819  0.16261489
+## [1] -0.14663936  0.39709406  1.51724177 -0.07099659 -0.91583239
 ## 
 ## [[4]]
-## [1]  1.5061414 -0.1407046 -1.2800489  0.7101624 -0.3410108
+## [1] 2.2245930 0.9023875 0.1009739 0.4756838 0.1575837
 ## 
 ## [[5]]
-## [1] 4.4973989 1.2585080 1.0000576 0.6176668 2.3968780</code></pre>
+## [1] 1.180080 1.762645 1.109094 1.275070 1.750406</code></pre>
 <pre class="r"><code>map_dbl(-2:2, rnorm, n = 5)</code></pre>
 <pre><code>## Error: Result 1 is not a length 1 atomic vector</code></pre>
 <p><code>map(-2:2, rnorm, n = 5)</code> runs rnorm with mean -2, then -1, …, 2, returning a list of 5 vectors, each with size 5. On the other hand, <code>map_dbl(-2:2, rnorm, n = 5)</code> does the same thing but also checks that the result is of type double and has a length of 1 (throws an error because doesn’t have length of 1).</p>
@@ -1306,7 +1344,7 @@ x</code></pre>
 
 every_2(1:5, function(x) {x &gt; 1})</code></pre>
 <pre><code>## [1] FALSE</code></pre>
-<p>purrr’s version is able to do more things with .p, (ex. taking a logical vector) and probably runs faster.</p>
+<p>purrr’s version is able to do more things with .p (ex. taking a logical vector) and probably runs faster.</p>
 </div>
 <div id="create-an-enhanced-col_sum-that-applies-a-summary-function-to-every-numeric-column-in-a-data-frame." class="section level3">
 <h3>2. Create an <code>enhanced col_sum()</code> that applies a summary function to every numeric column in a data frame.</h3>

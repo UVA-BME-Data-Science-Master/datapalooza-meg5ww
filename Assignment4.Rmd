@@ -16,7 +16,7 @@ library(tidyverse)
 
 ###1. Why is `TRUE` not a parameter to `rescale01()`? What would happen if `x` contained a single missing value, and `na.rm` was `FALSE`?
 
-`TRUE` is not a parameter to `rescale01()` because we don’t want it to be a parameter of a function that the user can change. If `x` containes a missing value and `na.rm` is `FALSE` then the output vector will have an NA value. 
+`TRUE` is not a parameter to `rescale01()` because we don’t want it to be a parameter of a function that the user can change. If `x` contains a missing value and `na.rm` is `FALSE` then the output vector will have an NA value. 
 
 ###2. In the second variant of `rescale01()`, infinite values are left unchanged. Rewrite `rescale01()` so that -`Inf` is mapped to 0, and `Inf` is mapped to 1.
 
@@ -41,7 +41,6 @@ x / sum(x, na.rm = TRUE)
 sd(x, na.rm = TRUE) / mean(x, na.rm = TRUE)
 ```
 
-
 ```
 prop_NA <- function(x) {
   return(mean(is.na(x)))
@@ -64,7 +63,7 @@ variance <- function(x) {
   sum_of_squares <- sum(diff_from_mean^2, rm.na = TRUE)
   return(sum_of_squares/(sum(!is.na(x)) - 1))
 }
-variance(c(1,10,9,2))
+variance(c(1,10,12,2))
 ```
 
 ```{r}
@@ -74,7 +73,7 @@ skewness <- function(x) {
   std_cubed <- sum(diff_from_mean^2, na.rm = TRUE)^(3/2)/sqrt(sum(!is.na(x)))
   return(third_moment/std_cubed)
 }
-skewness(c(1,10,9,2))
+skewness(c(1,10,12,2))
 ```
 
 ###5. Write `both_na()`, a function that takes two vectors of the same length and returns the number of positions that have an `NA` in both vectors.
@@ -95,7 +94,7 @@ is_directory <- function(x) file.info(x)$isdir
 is_readable <- function(x) file.access(x, 4) == 0
 ```
 
-`is_directory()` returns `TRUE` if `x` is a directory, and `FALSE` otherwise. `is_readable()` returns returns `TRUE` if a file can be read. They are useful because their function names reveal more about their function than the actual code. 
+`is_directory()` returns `TRUE` if `x` is a directory and `FALSE` otherwise. `is_readable()` returns `TRUE` if a file can be read. They are useful because their function names reveal more about their function than the actual code. 
 
 ###7. Read the complete lyrics to “Little Bunny Foo Foo”. There’s a lot of duplication in this song. Extend the initial piping example to recreate the complete song, and use functions to reduce the duplication.
 
@@ -147,8 +146,7 @@ f3 <- function(x, y) {
 
 ###2. Take a function that you’ve written recently and spend 5 minutes brainstorming a better name for it and its arguments.
 
-Function: analyze_f3, better name would be analyze_pop
-Arguments: target population, could call this pop_target
+Function: analyze_f3, better name would be analyze_pop. Arguments: target population, could call this pop_target.
 
 ###3. Compare and contrast `rnorm()` and `MASS::mvrnorm()`. How could you make them more consistent?
 
@@ -254,7 +252,7 @@ switch(1, "No", "Yes", "Maybe")
 switch(2, "No", "Yes", "Maybe")
 ```
 
-If you use `switch() with numeric values (as in `switch(n, ...)`), then it will return the nth argument in ..., as shown above.
+If you use `switch()` with numeric values (as in `switch(n, ...)`), then it will return the nth argument in ..., as shown above.
 
 ###6. What does this `switch()` call do? What happens if x is “e”?
 
@@ -315,7 +313,7 @@ commas(letters, collapse = "-")
 
 ###2. It’d be nice if you could supply multiple characters to the `pad` argument, e.g. `rule("Title", pad = "-+")`. Why doesn’t this currently work? How could you fix it?
 
-This doesn't current work because the original `rule` function copies the `pad` argument a very specific number of times (equal to the desired width minus the length of the title and five extra characters) - if `pad` is 2 characters rather than 1 then the output is almost twice as long. 
+This doesn't currently work because the original `rule` function copies the `pad` argument a very specific number of times (equal to the desired width minus the length of the title and five extra characters) - if `pad` is 2 characters rather than 1 then the output is almost twice as long. 
 
 Original: 
 ```{r}
@@ -575,6 +573,7 @@ out <- ""
 for (x in letters) {
   out <- stringr::str_c(out, x)
 }
+out
 
 # 2) 
 x <- sample(100)
@@ -583,6 +582,7 @@ for (i in seq_along(x)) {
   sd <- sd + (x[i] - mean(x)) ^ 2
 }
 sd <- sqrt(sd / (length(x) - 1))
+sd
 
 # 3) 
 x <- runif(100)
@@ -591,6 +591,7 @@ out[1] <- x[1]
 for (i in 2:length(x)) {
   out[i] <- out[i - 1] + x[i]
 }
+out
 ```
 
 1)
@@ -600,12 +601,14 @@ stringr::str_c(letters, collapse = "")
 
 2)
 ```{r}
+x <- sample(100)
 sd(x)
 ```
 
 3) 
 ```{r}
-all.equal(cumsum(x),out)
+x <- runif(100)
+cumsum(x)
 ```
 
 ###3. Combine your function writing and for loop skills: 1) Write a for loop that `prints()` the lyrics to the children’s song “Alice the camel”. 2) Convert the nursery rhyme “ten in the bed” to a function. Generalise it to any number of people in any sleeping structure. 3) Convert the song “99 bottles of beer on the wall” to a function. Generalise to any number of any vessel containing any liquid on any surface.
@@ -888,7 +891,7 @@ every_2 <- function(.x, .p, ...) {
 every_2(1:5, function(x) {x > 1})
 ```
 
-purrr's version is able to do more things with .p, (ex. taking a logical vector) and probably runs faster. 
+purrr's version is able to do more things with .p (ex. taking a logical vector) and probably runs faster. 
 
 ###2. Create an `enhanced col_sum()` that applies a summary function to every numeric column in a data frame.
 
