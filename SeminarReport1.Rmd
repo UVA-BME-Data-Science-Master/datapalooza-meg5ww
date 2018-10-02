@@ -1,0 +1,62 @@
+---
+title: "BME 4550: Seminar Report 1"
+author: "Monika Grabowska"
+date: "October 4, 2018"
+output: html_document
+---
+
+------
+
+#Seminar Speaker: Emery N. Brown, M.D., Ph.D.
+###Edward Hood Taplin Professor of Medical Engineering and Computational Neuroscience, Massachusetts Institute of Technology
+
+###Warren M. Zapol Professor of Anaesthesia, Massachusetts General Hospital/Harvard Medical School
+
+#Date/Time of Seminar: 9/21/2018, 2:00pm
+
+#Title of Seminar: Deciphering the Dynamics of the Unconscious Brain Under General Anesthesia
+
+------
+
+#Seminar Summary:
+
+##Short Overview: 
+The brain is not turned off under anesthesia, but rather is dynamic. Anesthetic drugs create and maintain oscillations that impair the ability of areas of the brain to communicate. These oscillations are visible on EEG (electroencephalogram) recordings, and vary based on factors such as the class of anesthetic used and age. EEG can be used to monitor the brain states of patients receiving general anesthesia to determine when the patient is fully anesthetized and provide insight into how much anesthetic drugs to use. 
+
+##Main Points: 
+
+Anesthesia is a drug-induced, reversible state, characterized by unconsciousness, amnesia, analgesia, akinesia, stability, and control. General anesthesia is not sleep. 
+
+The idea behind balanced general anesthesia is to pull from different drug categories and combine them to generate an anesthetized state (i.e. not only using ethers/inhaled drugs but also using opioids and relaxing/immobilizing drugs as well as drugs to help with hemodynamic stability, etc...).
+
+The effects of anesthetics are visible on EEGs. For example, you can see the instant that the anesthetic drug propofol takes effect from the EEG - propofol burns, thus there is a lot of noise on the EEG at first, but then the drug inactivates the brain stem and slow waves appear on the EEG. These oscillations get large parts of the brain to act in unison. 
+
+Key components of an EEG showing a brain under anesthesia: 
+
+1) Awake - amplitude ~ 5mV
+
+2) Paradoxical excitation - when the drug intended to sedate actually excites
+
+3) Sedative state - beta oscillations, 12-16 cycles per second 
+
+4) Large slow oscillations - brain stem inactivation, slow alpha oscillations (the pattern for someone treated with propofol)
+
+5) Burst suppression - isoelectric between bursts
+
+A pattern of anteriorization is visible from the EEGs of patients receiving propofol. When the person receiving the drugs becomes unconscious, the alpha oscillations will concentrate in the front of the head. When the drugs are turned off, these oscillations move in the opposite direction. Propofol works by enhancing GABA adrenergic inhibition, which is why the alpha oscillations under propofol are frontally coherent (the oscillations are going back and forth between the thalamus and the cortex). Alpha oscillations do not appear in children until around 4-6 months of age (there appears to be a switch that flips). However, only around 11-14 months of age do children show anteriorization with alpha oscillations when they become unconscious. 
+
+Different anesthetics have different EEG signatures that can be related to different circuit activities.
+
+The brain's response to anesthesia changes with age - as a person gets older, the oscillations shift downward and the amplitude of the oscillations is smaller.  
+
+Medical coma is a profound state of brain inactivation that is induced purposely to keep the brain in a state of burst suppression, typically used to allow rest after surgery or to stop seizures. Closed loop control of medical coma is feasible using an animal model. The Solt Laboratory at Harvard Medical School has examined reanimation after general anesthesia in a mouse model. They have found that a rat can wake up when given Ritalin (which blocks dopamine reuptake in the brain) while receiving anesthesia.  
+
+##Takeaways/Conclusions: 
+
+The brain is not turned off during anesthesia. Anesthetic drugs work by creating and sustaining oscillations in the brain. These oscillations are visible on EEGs and can be used to design control systems.  
+
+##Questions for the Speaker:
+
+1) Could EEG under anesthesia be used to determine a person's true "age" in terms of cognitive functioning, etc... (considering that all people age differently and a person's numerical age does not necessarily indicate their capabilities)? 
+
+2) Do people who take Ritalin for ADHD, etc... behave differently when receiving anesthesia? Do they require a higher dose of anesthetic drugs to lose consciousness to overcome the stimulus? 
