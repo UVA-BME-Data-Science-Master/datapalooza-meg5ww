@@ -114,6 +114,8 @@ write.csv(res_ordered, file="GSE106297_DESeq_all.csv" )
 
 In importing the transcript-level estimates, a `tx2gene` data frame was created to match the transcript IDs present in the files generated using Salmon with gene IDs (using the `EnsDb.Hsapiens.v86` annotation package since the *Ensembl Homo sapiens* v86 transcriptome was used as the reference transcriptome). Running the `results` function on the DESeqDataSet object `dds` creates a results table with log2 fold change, p-values, and adjusted p-values for each gene. This table was then arranged in order of ascending adjusted p-value. The output of the resulting `res_ordered` data frame is shown below (Figure 1). 
 
+![Figure 1. Top differentially expressed genes between 1 μM and 0 μM doxorubicin treatment for the GSE106297 dataset (gene IDs have not yet been converted to gene names).](de_output.png)
+
 # Future Directions 
 
 The output of this study - which we hope to be the elucidation of cardiomyocyte differential gene expression promoted by doxorubicin - can provide valuable information to physicians regarding potential secondary therapies to avoid cardiotoxicity in cancer patients. Future studies will include the addition of another experimental condition that includes patients administered both doxorubicin simultaneously with an anti-cardiotoxic (like Dexrazoxane) medication. Additionally, although this would not entail an RNA sequencing analysis, we would like to report the cancer-related outcomes of patients administered doxorubicin to evaluate its chemotherapeutic efficacy.
