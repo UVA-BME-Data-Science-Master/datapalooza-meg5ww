@@ -15,9 +15,9 @@ library(here)
 
 ### Doxorubicin-induced cardiotoxicity 
 
-Doxorubicin is a commonly used chemotherapy drug for many different types of cancer. The means by which Doxorubicin treats cancer is by virtue of topoisomerase II inhibition (7). Topoisomerase II cleaves both strands of DNA in order to relieve stress caused by supercoiling, making it key enzyme in the DNA replication process. By inhibiting topoisomerase II, Doxorubicin prevents the division and growth of cancer cells, but also normal, healthy cells as a ramification.
+Doxorubicin is a commonly used chemotherapy drug for many different types of cancer. The means by which doxorubicin treats cancer is by virtue of topoisomerase II inhibition (7). Topoisomerase II cleaves both strands of DNA in order to relieve stress caused by supercoiling, making it key enzyme in the DNA replication process. By inhibiting topoisomerase II, doxorubicin prevents the division and growth of cancer cells, but also normal, healthy cells as a ramification.
  
-One of the most alarming side effects of Doxorubicin is cardiotoxicity, which is damage to the heart resulting from drugs or chemicals. Damage can range from the weakening heart muscle walls, a decreased ventricular ejection fraction, arrhythmias, and heart failure. Genetic changes arising as a result of Doxorubicin can be observed and analyzed via RNA sequencing. The presence of Troponin I and brain natriuretic peptide (BNP) are apt to change with the introduction of Doxorubicin in cells. For this reason, Troponin I and BNP may serve as biomarkers, indicating the presence and degree of cardiotoxicity during RNA analysis. With the means to analyze cardiotoxicity by RNA analysis, there is the potential to further comprehend Doxorubicin's mechanisms of action and recommend other remedial points.
+One of the most alarming side effects of doxorubicin is cardiotoxicity, which is damage to the heart resulting from drugs or chemicals. Damage can range from the weakening heart muscle walls, a decreased ventricular ejection fraction, arrhythmias, and heart failure. Genetic changes arising as a result of doxorubicin can be observed and analyzed via RNA sequencing. The presence of Troponin I and brain natriuretic peptide (BNP) are apt to change with the introduction of doxorubicin in cells. For this reason, Troponin I and BNP may serve as biomarkers, indicating the presence and degree of cardiotoxicity during RNA analysis. With the means to analyze cardiotoxicity by RNA analysis, there is the potential to further comprehend doxorubicin's mechanisms of action and recommend other remedial points.
 
 
 ### RNA Sequencing 
@@ -30,7 +30,7 @@ This process begins in the laboratory when total RNA is extracted from the tissu
 
 ### Obtaining data
 
-All data sets used in this study were obtained from GEO. Two separate data sets comparing the effects of DOX on cardiomyocytes were studied. The first data set compared human embryonic stem cell derived cardiomyocytes that were treated with 0, 1, or 2.5 μm of DOX for 16 hours (4). The second data set studied obtained human-induced pluripotent stem cell derived cardiomyocytes from six female breast cancer patients that were treated with DOX. Three of these patients experienced cardiotoxicity as a result of DOX treatment, whereas three did not. These stem cells were then treated with either 0 or 1 ?m of DOX for 24 hours (1). Both data sets were processed via the platform Illumina HiSeq 2000 for high throughput sequencing. 
+All data sets used in this study were obtained from GEO. Two separate data sets comparing the effects of doxorubicin on cardiomyocytes were studied. The first data set compared human embryonic stem cell derived cardiomyocytes that were treated with 0, 1, or 2.5 uM of doxorubicin for 16 hours (4). The second data set studied obtained human-induced pluripotent stem cell derived cardiomyocytes from six female breast cancer patients that were treated with doxorubicin. Three of these patients experienced cardiotoxicity as a result of doxorubicin treatment, whereas three did not. These stem cells were then treated with either 0 or 1 uM of doxorubicin for 24 hours (1). Both data sets were processed via the platform Illumina HiSeq 2000 for high throughput sequencing. 
 
 
 ### Mapping reads to reference transcriptome
@@ -49,7 +49,7 @@ While no studies have found a specific change in gene expression that directly r
 In fact, cellular and mitochondrial iron metabolism is a burgeoning field of research  (5). The regulation of mitochondrial iron uptake and export are not yet completely elucidated; however, involved proteins may include mitochondrial ferritin (involved in iron storage) and mitoferrin-1 and -2 (involved in transport of iron). We hypothesize that the genes for these proteins may be altered in cases of doxorubicin-induced cardiotoxicity.
 
 # Preliminary Results
-Salmon was used to quantify the RNA sequencing data from the GSE106297 dataset. Raw data for the 0 and 1 μM doxorubicin treatment conditions were obtained from GEO/SRA, and converted to FASTQ format using the SRA toolkit (due to the large size of the runs, the analysis was performed using the Rivanna High-Performance Computing Cluster):
+Salmon was used to quantify the RNA sequencing data from the GSE106297 dataset. Raw data for the 0 and 1 uM doxorubicin treatment conditions were obtained from GEO/SRA, and converted to FASTQ format using the SRA toolkit (due to the large size of the runs, the analysis was performed using the Rivanna High-Performance Computing Cluster):
 
 ```
 module load sratoolkit
@@ -57,7 +57,7 @@ prefetch -v SRR6231704
 fastq-dump --split-files /home/meg5ww/ncbi/public/sra/SRR6231704.sra
 ```
 
-In the above code, SRR6231704 represents one of the SRA runs downloaded and converted to FASTQ format. SRA runs SRR6231704-SRR6231711 were used in this analysis, as these are the runs corresponding to the 0 μM doxorubicin (SRR6231704-SRR6231707) and 1 μM doxorubicin (SRR6231708-SRR6231711) treatment conditions. Since the SRA files contained paired-end sequencing data, `--split-files` was needed to produce two FASTQ files per run, one for R1 and one for R2. 
+In the above code, SRR6231704 represents one of the SRA runs downloaded and converted to FASTQ format. SRA runs SRR6231704-SRR6231711 were used in this analysis, as these are the runs corresponding to the 0 uM doxorubicin (SRR6231704-SRR6231707) and 1 uM doxorubicin (SRR6231708-SRR6231711) treatment conditions. Since the SRA files contained paired-end sequencing data, `--split-files` was needed to produce two FASTQ files per run, one for R1 and one for R2. 
 
 Next, Salmon was used to download a reference transcriptome for *Homo sapiens* and build an index on this transcriptome. 
 
@@ -95,7 +95,7 @@ txdf <- transcripts(EnsDb.Hsapiens.v86, return.type="DataFrame")
 tx2gene <- as.data.frame(txdf[,c("tx_id", "gene_id")])
 txi.salmon <- tximport(files, type = "salmon", tx2gene = tx2gene, ignoreTxVersion = TRUE)
 
-# assign experimental variables - 0 or 1 μM doxorubicin treatment
+# assign experimental variables - 0 or 1 uM doxorubicin treatment
 condition = factor(c("0uM","0uM","0uM","0uM","1uM","1uM","1uM","1uM"))
 exp_design <- data.frame(row.names=colnames(txi.salmon$counts), condition = condition)
 
@@ -114,7 +114,7 @@ write.csv(res_ordered, file="GSE106297_DESeq_all.csv" )
 
 In importing the transcript-level estimates, a `tx2gene` data frame was created to match the transcript IDs present in the files generated using Salmon with gene IDs (using the `EnsDb.Hsapiens.v86` annotation package since the *Ensembl Homo sapiens* v86 transcriptome was used as the reference transcriptome). Running the `results` function on the DESeqDataSet object `dds` creates a results table with log2 fold change, p-values, and adjusted p-values for each gene. This table was then arranged in order of ascending adjusted p-value. The output of the resulting `res_ordered` data frame is shown below (Figure 1). 
 
-![Figure 1. Top differentially expressed genes between 1 μM and 0 μM doxorubicin treatment for the GSE106297 dataset (gene IDs have not yet been converted to gene names).](de_output.png)
+![Figure 1. Top differentially expressed genes between 1 uM and 0 uM doxorubicin treatment for the GSE106297 dataset (gene IDs have not yet been converted to gene names).](de_output.png)
 
 # Future Directions 
 
