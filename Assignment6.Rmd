@@ -51,7 +51,7 @@ X[25,3]
 
 The entry in row 25, column 3 is 225. 
 
-###2. Using the function cbind, create a 10 x 5 matrix with first column x=1:10. Then add 2*x, 3*x, 4*x and 5*x to columns 2 through 5. What is the sum of the elements of the 7th row?
+###2. Using the function cbind, create a 10 x 5 matrix with first column x=1:10. Then add 2x, 3x, 4x and 5x to columns 2 through 5. What is the sum of the elements of the 7th row?
 
 ```{r}
 x=1:10
@@ -75,10 +75,11 @@ matrix(1:60,20,3,byrow=TRUE)
 
 ```{r}
 X <- matrix(1:6,3,2)
+X
 X %*% matrix(1,ncol(X) )
 ```
 
-`X %*% matrix(1,ncol(X) )` 
+`X %*% matrix(1,ncol(X) )` is not equivalent to X.
 
 ###2. Solve the following system of equations using R: 3a + 4b − 5c + d = 10, 2a + 2b + 2c − d = 5, a − b + 5c − 5d = 7, 5a + d = 4. What is the solution for c?
 
@@ -133,12 +134,16 @@ X.a <- X[rownames(X) == "a",]
 X.a %*% beta
 ```
 
+The fitted value for the A samples is 5.
+
 ###2. What is the fitted value for the B samples?
 
 ```{r}
 X.b <- X[rownames(X) == "b",]
 X.b %*% beta
 ```
+
+The fitted value for the B samples is 7.
 
 ###3. Suppose now we are comparing two treatments B and C to a control group A, each with two samples. This design can be represented with a model matrix like so:
 
@@ -161,12 +166,17 @@ X.b = X[rownames(X) == "b",]
 X.b %*% beta
 ```
 
+The fitted value for the B samples is 13.
+
 ###4. What is the fitted value for the C samples?
 
 ```{r}
 X.c = X[rownames(X) == "c",]
 X.c %*% beta
-````
+```
+
+
+The fitted value for the C samples is 7.
 
 ----
 
@@ -301,7 +311,7 @@ y <- sampledat$sheight
 betahat <- lm(y~x)$coef
 ```
 
-###The fitted values Yˆ from a linear model can be obtained with:
+###The fitted values from a linear model can be obtained with:
 
 ```{r}
 fit <- lm(y ~ x)
@@ -313,6 +323,7 @@ fit$fitted.values
 ```{r}
 e <- y-fit$fitted.values
 ssr <- sum(e^2)
+ssr
 ```
 
 The sum of the squared residuals is 256.2152.
@@ -360,7 +371,7 @@ The standard error for the slope in the previous set of exercises is 0.5857.
 
 ----
 
-###Suppose we have an experiment with two species A and B, and two conditions, control and treated.
+###1. Suppose we have an experiment with two species A and B, and two conditions, control and treated.
 
 ```{r}
 species <- factor(c("A","A","B","B"))
@@ -368,7 +379,7 @@ condition <- factor(c("control","treated","control","treated"))
 model.matrix(~ species + condition)
 ```
 
-###1. What should the contrast vector be, to obtain the difference between the species B control group and the species A treatment group (species B control - species A treatment)? Assume that the coefficients (columns of design matrix) are: Intercept, speciesB, conditiontreated.
+###What should the contrast vector be, to obtain the difference between the species B control group and the species A treatment group (species B control - species A treatment)? Assume that the coefficients (columns of design matrix) are: Intercept, speciesB, conditiontreated.
 
 ```{r}
 y = rnorm(4)
