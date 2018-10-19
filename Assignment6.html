@@ -343,7 +343,7 @@ A</code></pre>
 ## tt -0.042415896 -0.09679323 -0.15746606 -0.22443439
 ##     0.026848434  0.04443879  0.06388076  0.08517434</code></pre>
 <pre class="r"><code>-2 * (A %*% y) [3]</code></pre>
-<pre><code>## [1] 9.763484</code></pre>
+<pre><code>## [1] 10.15975</code></pre>
 <p><code>-2 * (A %*% y) [3]</code> is the LSE of g.</p>
 </div>
 <div id="in-the-lines-of-code-above-the-function-rnorm-introduced-randomness.-this-means-that-each-time-the-lines-of-code-above-are-repeated-the-estimate-of-g-will-be-different.-use-the-code-above-in-conjunction-with-the-function-replicate-to-generate-100000-monte-carlo-simulated-datasets.-for-each-dataset-compute-an-estimate-of-g.-remember-to-multiply-by--2.-what-is-the-standard-error-of-this-estimate" class="section level3">
@@ -354,7 +354,7 @@ A</code></pre>
   return(betahats)
 })
 sd(betahat)</code></pre>
-<pre><code>## [1] 0.4274464</code></pre>
+<pre><code>## [1] 0.4301154</code></pre>
 </div>
 <div id="in-the-father-and-son-height-examples-we-have-randomness-because-we-have-a-random-sample-of-father-and-son-pairs.-for-the-sake-of-illustration-lets-assume-that-this-is-the-entire-population" class="section level3">
 <h3>3. In the father and son height examples, we have randomness because we have a random sample of father and son pairs. For the sake of illustration, let’s assume that this is the entire population:</h3>
@@ -381,7 +381,7 @@ betahat = lm(y~x)$coef</code></pre>
   return(lm(y ~ x)$coef[2])
 })
 sd(betahat)</code></pre>
-<pre><code>## [1] 0.1224158</code></pre>
+<pre><code>## [1] 0.1247647</code></pre>
 </div>
 <div id="which-of-the-following-is-closest-to-the-covariance-between-father-heights-and-son-heights" class="section level3">
 <h3>4. Which of the following is closest to the covariance between father heights and son heights?</h3>
