@@ -1,0 +1,669 @@
+---
+title: "BME4550_Fall2018_Assignment7"
+author: "Monika Grabowska"
+date: "October 25, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(GSE5859Subset)
+library(SpikeInSubset)
+library(genefilter)
+library(qvalue)
+library(tissuesGeneExpression)
+library(rafalib)
+```
+
+## Exercises in Inference For High Dimensional Data 
+
+###1. How many samples were processed on 2005-06-27?
+
+```{r}
+data(GSE5859Subset)
+sum(sampleInfo$date=="2005-06-27")
+```
+
+5 samples samples were processed on 2005-06-27. 
+
+###2. How many of the genes represented in this particular technology are on chromosome Y?
+
+```{r}
+sum(geneAnnotation$CHR=="chrY", na.rm = T)
+```
+
+21 of the genes are on chromosome Y. 
+
+###3. What is the log expression value of the gene ARPC1A on the one subject that we measured on 2005-06-10?
+
+```{r}
+symbol_idx <- which(geneAnnotation$SYMBOL=="ARPC1A")
+date_idx <- which(sampleInfo$date=="2005-06-10")
+geneExpression[symbol_idx, date_idx]
+```
+
+The log expression value of the gene ARPC1A on the one subject that we measured on 2005-06-10 is 8.233599.
+
+----
+
+```{r}
+set.seed(1)
+population <- read.csv("femaleControlsPopulation.csv")
+pvals <- replicate(1000,{
+control = sample(population[,1],12)
+treatment = sample(population[,1],12)
+t.test(treatment,control)$p.val
+})
+```
+
+###1. What proportion of the p-values is below 0.05?
+
+```{r}
+mean(pvals < 0.05)
+```
+
+###2. What proportion of the p-values is below 0.01?
+
+```{r}
+mean(pvals < 0.01)
+```
+
+###3. Assume you are testing the effectiveness of 20 diets on mice weight. For each of the 20 diets, you run an experiment with 10 control mice and 10 treated mice. Assume the null hypothesis, that the diet has no effect, is true for all 20 diets and that mice weights follow a normal distribution, with mean 30 grams and a standard deviation of 2 grams. Run a Monte Carlo simulation for one of these studies:
+
+```{r}
+cases = rnorm(10,30,2)
+controls = rnorm(10,30,2)
+t.test(cases,controls)
+```
+
+###Now run a Monte Carlo simulation imitating the results for the experiment for all 20 diets. If you set the seed at 100, `set.seed(100)`, how many of p-values are below 0.05?
+
+```{r}
+set.seed(100)
+pvals<- replicate(20,{
+  cases = rnorm(10,30,2)
+  controls = rnorm(10,30,2)
+  t.test(cases,controls)$p.value
+})
+sum(pvals < 0.05)
+```
+
+1 p-value is below 0.05. 
+
+###4. Now create a simulation to learn about the distribution of the number of p-values that are less than 0.05. In question 3, we ran the 20 diet experiment once. Now we will run the experiment 1,000 times and each time save the number of p-values that are less than 0.05. Set the seed at 100, `set.seed(100)`, run the code from Question 3 1,000 times, and save the number of times the p-value is less than 0.05 for each of the 1,000 instances. What is the average of these numbers? This is the expected number of tests (out of the 20 we run) that we will reject when the null is true.
+
+```{r}
+set.seed(100)
+p_lessthan = replicate(1000,{
+  pvals = replicate(20,{
+    cases = rnorm(10,30,2)
+    controls = rnorm(10,30,2)
+    t.test(cases,controls)$p.value
+    })
+  sum(pvals < 0.05)
+})
+
+mean(p_lessthan) 
+```
+
+The average of these numbers is 1.007. 
+
+###5. What this says is that on average, we expect some p-value to be 0.05 even when the null is true for all diets. Use the same simulation data and report for what percent of the 1,000 replications did we make more than 0 false positives?
+
+```{r}
+mean(p_lessthan > 0)
+```
+
+We made more than 0 false positives for 64.6 percent of the replications. 
+
+----
+
+###1. Assume the null is true and denote the p-value you would get if you ran a test as P. Define the function f(x) = Pr(P > x) . What does f(x) look like?
+
+The identity line.
+
+###2. In the previous exercises, we saw how the probability of incorrectly rejecting the null for at least one of 20 experiments for which the null is true, is well over 5%. Now let’s consider a case in which we run thousands of tests, as we would do in a high throughput experiment. We previously learned that under the null, the probability of a p-value < p is p. If we run 8,793 independent tests, what it the probability of incorrectly rejecting at least one of the null hypothesis?
+
+```{r}
+min_p <- replicate(10000, min(runif(8793,0,1)) < 0.05)
+mean(min_p >= 1)
+```
+
+The probability of incorrectly rejecting at least one of the null hypothesis is 1. 
+
+###3. Suppose we need to run 8,793 statistical tests and we want to make the probability of a mistake very small, say 5%. Use the answer to Exercise 2 to determine how small we have to change the cutoff, previously 0.05, to lower our probability of at least one mistake to be 5%.
+
+Probability of at least one mistake = 0.05 = 1 - (1-k)^(8793) 
+k = 1 - (0.95)^(1/8793) = 0.0000058334
+
+```{r}
+min_p <- replicate(10000, min(runif(8793,0,1)) < 0.0000058334)
+mean(min_p >= 1)
+```
+
+Our cutoff needs to be 0.0000058334 to lower our probability of at least one mistake to be 5%.
+
+###4. Define: 
+
+```{r}
+alphas <- seq(0,0.25,0.01)
+```
+
+###Make a plot of alpha/m and 1 − (1 − alpha)^(1/m) for various values of m>1. Which procedure is more conservative Bonferroni’s or Sidek’s?
+
+```{r}
+par(mfrow=c(2,2))
+for(m in c(2,10,100,1000)){
+  plot(alphas,alphas/m - (1-(1-alphas)^(1/m)),type="l")
+  abline(h=0,col=2,lty=2)
+}
+```
+
+Bonferroni's procedure is more conservative. 
+
+###5. To simulate the p-value results of, say 8,793 t-tests for which the null is true, we don’t actually have to generate the original data. We can generate p-values for a uniform distribution like this: ‘pvals <- runif(8793,0,1)'. Using what we have learned, set the cutoff using the Bonferroni correction and report back the FWER. Set the seed at 1 and run 10,000 simulation.
+
+```{r}
+set.seed(1)
+B <- 10000
+m <- 8793
+alpha <- 0.05
+pvals <- matrix(runif(B*m,0,1),B,m)
+k <- alpha/m
+mistakes <- rowSums(pvals<k) 
+mean(mistakes>0)
+```
+
+###6. Using the same seed, repeat exercise 5, but for Sidek’s cutoff.
+
+```{r}
+set.seed(1)
+k <- (1-(1-alpha)^(1/m))
+mistakes <- rowSums(pvals<k) 
+mean(mistakes>0)
+```
+
+###7. Load the gene expression data. We are interested in comparing gene expression between the two groups defined in the sampleInfo table. Compute a p-value for each gene using the function rowttests from the genefilter package. How many genes have p-values smaller than 0.05?
+
+```{r}
+data(GSE5859Subset)
+alpha <- 0.05
+g <- factor(sampleInfo$group)
+pvals <- rowttests(geneExpression,g)$p.value
+sum(pvals < alpha)
+```
+
+1383 genes have p-values smaller than 0.05.
+
+###8. Apply the Bonferroni correction to achieve a FWER of 0.05. How many genes are called significant under this procedure?
+
+```{r}
+k <- alpha / length(pvals)
+sum(pvals < k)
+```
+
+10 genes are called significant under this procedure.
+
+###9. In R, we can compute q-values using the p.adjust function with the FDR option. Read the help file for `p.adjust` and compute how many genes achieve a q-value < 0.05 for our gene expression dataset.
+
+```{r}
+g <- factor(sampleInfo$group)
+pvals <- rowttests(geneExpression,g)$p.value
+fdr <- p.adjust(pvals,method="fdr")
+sum(fdr < alpha)
+```
+
+13 genes achieve a q-value < 0.05 for the gene expression dataset.
+
+###10. Now use the qvalue function, in the Bioconductor qvalue package, to estimate q-values using the procedure described by Storey. How many genes have q-values below 0.05?
+
+```{r}
+res <- qvalue(pvals)
+sum(res$qvalues < alpha)
+```
+
+22 genes have q-values below 0.05. 
+
+###11. Read the help file for qvalue and report the estimated proportion of genes for which the null hypothesis is true pi0 = m0/m.
+
+```{r}
+res$pi0
+```
+
+###12. The number of genes passing the q-value < 0.05 threshold is larger with the q-value function than the `p.adjust` difference. Why is this the case? Make a plot of the ratio of these two estimates to help answer the question.
+
+```{r}
+plot(qvalue(pvals)$qvalue/p.adjust(pvals,method="fdr"))
+abline(h=qvalue(pvals)$pi0,col=2)
+```
+
+The `qvalue` function estimates the proportion of genes for which the null hypothesis
+is true and provides a less conservative estimate.
+
+###13. Create a Monte Carlo Simulation in which you simulate measurements from 8,793 genes for 24 samples, 12 cases and 12 controls. Then for 100 genes create a difference of 1 between cases and controls. You can use the code provided below. Run this experiment 1,000 times with a Monte Carlo simulation. For each instance, compute p-values using a t-test and keep track of the number of false positives and false negatives. Compute the false positive rate and false negative rates if we use Bonferroni, q-values from p.adjust, and q-values from qvalue function. Set the seed to 1 for all three simulations. What is the false positive rate for Bonferroni?
+
+```{r}
+set.seed(1)
+n <- 24
+m <- 8793
+B <- 1000
+delta <- 1
+positives <- 100
+g <- factor(rep(c(0,1),each=12))
+result <- replicate(B,{
+  mat <- matrix(rnorm(n*m),m,n)
+  mat[1:positives,1:(n/2)] <- mat[1:positives,1:(n/2)]+delta
+  pvals = rowttests(mat,g)$p.val
+  ##Bonferroni
+  FP1 <- sum(pvals[-(1:positives)]<=0.05/m)  
+  FN1 <- sum(pvals[1:positives]>0.05/m)
+   #p.adjust q-value
+  qvals1 = p.adjust(pvals,method="fdr")
+  FP2 <- sum(qvals1[-(1:positives)]<=0.05)
+  FN2 <- sum(qvals1[1:positives]>0.05)
+  #qvalue q-value
+  qvals2 = qvalue(pvals)$qvalue
+  FP3 <- sum(qvals2[-(1:positives)]<=0.05)
+  FN3 <- sum(qvals2[1:positives]>0.05)  
+  c(FP1,FN1,FP2,FN2,FP3,FN3)
+})
+```
+
+```{r}
+mean(result[1,]/(m-positives))
+```
+
+The false positive rate for Bonferroni is 5.291614e-06. 
+
+###14. What are the false negative rates for Bonferroni?
+
+```{r}
+mean(result[2,]/(positives))
+```
+
+The false negative rate for Bonferroni is 0.99568.
+
+###15. What are the false positive rates for `p.adjust`?
+
+```{r}
+mean(result[3,]/(m-positives))
+```
+
+The false positive rate for `p.adjust` is 1.403428e-05. 
+
+###16. What are the false negative rates for `p.adjust`?
+
+```{r}
+mean(result[4,]/(positives))
+```
+
+The false negative rate for `p.adjust` is 0.99222.
+
+###17. What are the false positive rates for `qvalues`?
+
+```{r}
+mean(result[5,]/(m-positives))
+```
+
+The false positive rate for `qvalues` is 1.495456e-05. 
+
+###18. What are the false negative rates for `qvalues`?
+
+```{r}
+mean(result[6,]/(positives))
+```
+
+The false negative rate for `qvalues` is 0.99201. 
+
+----
+
+###1. What proportion of the points are inside the box?
+
+```{r}
+data(mas133)
+e <- exprs(mas133)
+plot(e[,1],e[,2],main=paste0("corr=",signif(cor(e[,1],e[,2]),3)),cex=0.5)
+k <- 3000
+b <- 1000 #a buffer
+polygon(c(-b,k,k,-b),c(-b,-b,k,k),col="red",density=0,border="red")
+```
+
+```{r}
+sample1 <- e[, 1] < k
+sample2 <- e[, 2] < k
+sum(sample1 & sample2) / nrow(e)
+```
+
+###2. Now make the sample plot with log:
+
+```{r}
+plot(log2(e[,1]),log2(e[,2]))
+k <- log2(3000)
+b <- log2(0.5)
+polygon(c(b,k,k,b),c(b,b,k,k),col="red",density=0,border="red")
+```
+
+###What is an advantage of taking the log?
+
+The tails do not dominate the plot: 95% of data is not in a tiny section of plot.
+
+###3. Make an MA-plot:
+
+```{r}
+e <- log2(exprs(mas133))
+plot((e[,1]+e[,2])/2,e[,2]-e[,1],cex=0.5)
+```
+
+###The two samples we are plotting are replicates (they are random samples from the same batch of RNA). The correlation of the data was 0.997 in the original scale and 0.96 in the log-scale. High correlations are sometimes confused with evidence of replication. However, replication implies we get very small differences between the observations, which is better measured with distance or differences. What is the standard deviation of the log ratios for this comparison?
+
+```{r}
+y <- e[,2] - e[,1]
+sd(y)
+```
+
+The standard deviation of the log ratios for this comparison is 0.7767887.
+
+###4. How many fold changes above 2 do we see?
+
+```{r}
+table(abs(y) > 2)
+```
+
+There are 871 fold changes above 2. 
+
+----
+
+## Exercises in Distance and Dimension Reduction 
+
+###1. How many biological replicates for hippocampus?
+
+```{r}
+data(tissuesGeneExpression)
+sum(tissue=="hippocampus")
+```
+
+There are 31 biological replicates for hippocampus.
+
+###2. What is the distance between samples 3 and 45?
+
+```{r}
+d <- dist(t(e))
+as.matrix(d)[3,45]
+```
+
+The distance between samples 3 and 45 is 152.5662.
+
+###3. What is the distance between gene `210486_at` and `200805_at`?
+
+```{r}
+x <- e ["210486_at",]
+y <- e ["200805_at",]
+sqrt(crossprod(x-y))
+```
+
+The distance between gene `210486_at` and `200805_at` is 41.01153.
+
+###4. If I run the command (don’t run it!): `d = as.matrix( dist(e) )`, how many cells (number of rows times number of columns) will this matrix have?
+
+This matrix will have 22215 * 22215 = 493506225 cells. 
+
+```{r}
+nrow(e)^2
+```
+
+###5. Compute the distance between all pair of samples. Read the help file for dist. How many distances are stored in d? Hint: What is the length of d?
+
+```{r}
+d = dist(t(e))
+length(d)
+```
+
+17766 distances are stored in d. 
+
+###6. Why is the answer to exercise 5 not `ncol(e)^2`?
+
+```{r}
+ncol(e)*(ncol(e)-1)/2
+```
+
+Because we take advantage of symmetry: only lower triangular matrix is stored
+thus only `ncol(e)*(ncol(e)-1)/2` values.
+
+----
+
+###1. Compute the SVD of e: 
+
+```{r}
+s = svd(e)
+```
+
+###Now compute the mean of each row:
+
+```{r}
+m = rowMeans(e)
+```
+
+###What is the correlation between the first column of U and m?
+
+```{r}
+cor(s$u[,1],m)
+```
+
+The correlation between the first column of U and m is -0.9999998. 
+
+###2. In exercise 1, we saw how the first column relates to the mean of the rows of e. If we change these means, the distances between columns do not change. For example, changing the means does not change the distances:
+
+```{r}
+newmeans = rnorm(nrow(e)) ##random values we will add to create new means
+newe = e+newmeans ##we change the means
+sqrt(crossprod(e[,3]-e[,45]))
+sqrt(crossprod(newe[,3]-newe[,45]))
+```
+
+###So we might as well make the mean of each row 0, since it does not help us approximate the column distances. We will define y as the detrended e and recompute the SVD:
+
+```{r}
+y = e - rowMeans(e)
+s = svd(y)
+```
+
+###We showed that UDV^T is equal to y up to numerical error:
+
+```{r}
+resid = y - s$u %*% diag(s$d) %*% t(s$v)
+max(abs(resid))
+```
+
+###Which of the following gives us the same as `diag(s$d)%*%t(s$v)`?
+
+`s$d * t(s$v)` gives the same as `diag(s$d)%*%t(s$v)`.
+
+```{r}
+head(diag(s$d)%*%t(s$v))
+```
+
+```{r}
+head(s$d * t(s$v))
+```
+
+###3. If we define `vd = t(s$d * t(s$v))`, then which of the following is not the same UDV^T?
+
+`tcrossprod(s$u,vd)` is not the same UDV^T.
+
+###4. Let `z = s$d * t(s$v)`. We showed derivation demonstrating that because U is orthogonal, the distance between `e[,3]` and `e[,45]` is the same as the distance between `y[,3]` and `y[,45]`, which is the same as `vd[,3]` and `vd[,45]`.
+
+```{r}
+z = s$d * t(s$v)
+sqrt(crossprod(e[,3]-e[,45]))
+sqrt(crossprod(y[,3]-y[,45]))
+sqrt(crossprod(z[,3]-z[,45]))
+```
+
+###Note that the columns z have 189 entries, compared to 22,215 for e. What is the difference, in absolute value, between the actual distance:
+
+```{r}
+sqrt(crossprod(e[,3]-e[,45]))
+```
+
+###and the approximation using only two dimensions of z ?
+
+```{r}
+realdistance = sqrt(crossprod(e[,3]-e[,45]))
+approxdistance = sqrt(crossprod(z[1:2,3]-z[1:2,45]))
+abs(realdistance - approxdistance)
+```
+
+The difference is 40.62416.
+
+###5. How many dimensions do we need to use for the approximation in exercise 4 to be within 10%?
+
+```{r}
+ks <- 1:189
+realdistance <- sqrt(crossprod(e[,3]-e[,45]))
+approxdistances <- sapply(ks,function(k){
+  sqrt(crossprod(z[1:k,3,drop=FALSE]-z[1:k,45,drop=FALSE] )) 
+})
+percentdiff <- 100*abs(approxdistances - realdistance)/realdistance
+min(ks[which(percentdiff < 10)])
+```
+
+We need to use 7 dimensions. 
+
+###6. Compute distances between sample 3 and all other samples.
+
+```{r}
+distances <- sqrt(apply(e[,-3]-e[,3],2,crossprod))
+distances
+```
+
+###7. Recompute this distance using the 2 dimensional approximation. What is the Spearman correlation between this approximate distance and the actual distance?
+
+```{r}
+approxdistances <- sqrt(apply(z[1:2,-3]-z[1:2,3],2,crossprod))
+cor(distances,approxdistances,method="spearman")
+```
+
+The Spearman correlation between this approximate distance and the actual distance is 0.8598592.
+
+----
+
+###1. Using the z we computed in exercise 4 of the previous exercises:
+
+```{r}
+data(tissuesGeneExpression)
+y = e - rowMeans(e)
+s = svd(y)
+z = s$d * t(s$v)
+```
+
+###We can make an mds plot:
+
+```{r}
+ftissue = factor(tissue)
+plot(z[1,],z[2,],col=as.numeric(ftissue))
+legend("topleft",levels(ftissue),col=seq_along(ftissue),pch=1)
+```
+
+###Now run the function cmdscale on the original data:
+
+```{r}
+d = dist(t(e))
+mds = cmdscale(d)
+```
+
+###What is the absolute value of the correlation between the first dimension of z and the first dimension in mds?
+
+```{r}
+abs(cor(z[1,],mds[,1]))
+```
+
+###2. What is the absolute value of the correlation between the second dimension of z and the second dimension in mds?
+
+```{r}
+abs(cor(z[2,],mds[,2]))
+```
+
+###3. Load the following dataset:
+
+```{r}
+data(GSE5859Subset)
+```
+
+###Compute the svd and compute z.
+
+```{r}
+s = svd(geneExpression-rowMeans(geneExpression))
+z = s$d * t(s$v)
+```
+
+###Which dimension of z most correlates with the outcome `sampleInfo$group`?
+
+```{r}
+which.max(cor(sampleInfo$g,t(z)))
+```
+
+The first dimension of z correlates with the outcome `sampleInfo$group`.
+
+###4. What is this max correlation?
+
+```{r}
+max(cor(sampleInfo$g,t(z)))
+```
+
+This max correlation is 0.6236858.
+
+###5. Which dimension of z has the second highest correlation with the outcome `sampleInfo$group`?
+
+```{r}
+which.max(cor(sampleInfo$g,t(z))[-1]) + 1
+```
+
+The sixth dimension of z has the second highest correlation with the outcome `sampleInfo$group`.
+
+###6. Note these measurements were made during two months:
+
+```{r}
+sampleInfo$date
+```
+
+###We can extract the month this way:
+
+```{r}
+month = format( sampleInfo$date, "%m")
+month = factor( month)
+```
+
+###Which dimension of z has the second highest correlation with the outcome `month`?
+
+```{r}
+which.max(cor( as.numeric(month), t(z))[-1]) + 1
+```
+
+The second dimension of z has the second highest correlation with the outcome `month`.
+
+###7. What is this correlation?
+
+```{r}
+max(cor( as.numeric(month), t(z))[-1]) 
+```
+
+This correlation is 0.4479168. 
+
+###8. (Advanced) The same dimension is correlated with both the group and the date. The following are also correlated:
+
+```{r}
+table(sampleInfo$g,month)
+```
+
+###So is this first dimension related directly to group or is it related only through the month? Note that the correlation with month is higher. This is related to batch effects which we will learn about later. In exercise 3 we saw that one of the dimensions was highly correlated to the `sampleInfo$group`. Now take the 5th column of U and stratify by the gene chromosome. Remove chrUn and make a boxplot of the values of U5 stratified by chromosome. Which chromosome looks different from the rest? Copy and paste the name as it appears in `geneAnnotation`. Given the answer to the last exercise, any guesses as to what `sampleInfo$group` represents?
+
+```{r}
+result = split(s$u[,6],geneAnnotation$CHR)
+result = result[ which(names(result)!="chrUn") ]
+boxplot(result,range=0)
+boxplot(result,range=0,ylim=c(-0.025,0.025))
+medians = sapply(result,median)
+names(result)[ which.max(abs(medians))]
+```
+
+chrY looks different from the rest. 
