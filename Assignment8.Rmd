@@ -1,0 +1,350 @@
+---
+title: "BME4550_Fall2018_Assignment8"
+author: "Monika Grabowska"
+date: "November 1, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(rafalib)
+library(GSE5859Subset)
+library(matrixStats)
+library(gplots)
+library(RColorBrewer)
+library(genefilter)
+library(class)
+library(caret)
+```
+
+## Exercises in Basic Machine Learning
+
+###1.  Create a random matrix with no correlation in the following way:
+
+```{r}
+set.seed(1)
+m = 10000
+n = 24
+x = matrix(rnorm(m*n),m,n)
+colnames(x)=1:n
+```
+
+###Run hierarchical clustering on this data with the `hclust` function with default parameters to cluster the columns. Create a dendrogram. In the dendrogram, which pairs of samples are the furthest away from each other?
+
+```{r}
+hc_data = hclust(dist(t(x)))
+plot(hc_data)
+```
+
+###2. Set the seed at 1, `set.seed(1)`, and replicate the creation of this matrix:
+
+```{r}
+set.seed(1)
+m = 10000
+n = 24
+```
+
+###then perform hierarchical clustering as in the solution to exercise 1, and find the number of clusters if you use `cuttree` at height 143. This number is a random variable. Based on the Monte Carlo simulation, what is the standard error of this random variable?
+
+```{r}
+rep_cluster = replicate(100,{
+  x = matrix(rnorm(m*n),m,n)
+  hc_data = hclust(dist(t(x)))
+  length(unique(cutree(hc_data,h=143)))})
+plot(table(rep_cluster))
+popsd(rep_cluster)
+```
+
+###3. Run `kmeans` with 4 centers for the blood RNA data:
+
+```{r}
+data(GSE5859Subset)
+```
+
+###Set the seed to 10, `set.seed(10)`, right before running `kmeans` with 5 centers. Explore the relationship of clusters and information in `sampleInfo`. Which of the following best describes what you find?
+
+```{r}
+set.seed(10)
+km <- kmeans(t(geneExpression),5)
+mds = cmdscale(dist(t(geneExpression)))
+mypar(1,1)
+plot(mds, bg=km$cl, pch=21)
+
+table(sampleInfo$group,km$cluster)
+table(sampleInfo$date,km$cluster)
+```
+
+Date is driving the clusters.
+
+###4. Load the data:
+
+```{r}
+data(GSE5859Subset)
+```
+
+###Pick the 25 genes with the highest across sample variance. 
+
+```{r}
+sds = rowMads(geneExpression)
+genes = order(sds,decreasing=TRUE)[1:25]
+```
+
+###Use `heatmap.2` to make a heatmap showing the `sampleInfo$group` with color, the date as labels, the rows labelled with chromosome, and scaling the rows. What do we learn from this heatmap?
+
+```{r}
+# color
+cols = colorRampPalette(rev(brewer.pal(11,"RdBu")))(25)
+gcol=brewer.pal(3,"Dark2")
+gcol=gcol[sampleInfo$g+1]
+
+# date as labels
+labcol= gsub("2005-","",sampleInfo$date)  
+
+## make heatmap
+heatmap.2(geneExpression[genes,],
+          col = cols,
+          trace = "none",
+          scale = "row",
+          labRow = geneAnnotation$CHR[genes],
+          labCol = labcol,
+          ColSideColors = gcol,
+          key = FALSE)
+```
+
+From the heatmap, we can see that there is a group of chrY genes in group 0 that appear to be driving the clustering. 
+
+###5. Create a large data set of random data that is completely independent of `sampleInfo$group` like this:
+
+```{r}
+set.seed(17)
+m = nrow(geneExpression)
+n = ncol(geneExpression)
+x = matrix(rnorm(m*n),m,n)
+g = factor(sampleInfo$g )
+```
+
+###Create two heatmaps with these data. Show the group g either with labels or colors. First, take the 50 genes with smallest p-values obtained with `rowttests`. Then, take the 50 genes with largest standard deviations. Which of the following statements is true?
+
+```{r}
+cols = colorRampPalette(rev(brewer.pal(11,"RdBu")))(25)
+ttest = rowttests(x,g)
+sds = rowSds(x)
+genes = list(t=order(ttest$p.value)[1:50], s=order(-sds)[1:50])
+for(gene in genes) {
+    heatmap.2(x[gene,],
+          col = cols,
+          trace = "none",
+          scale = "row",
+          labCol = g,
+          key=FALSE)
+}
+```
+
+There is no relationship between g and x, but with 8,793 tests some will appear significant by chance. Selecting genes with the t-test gives us a deceiving result.
+
+----
+
+###1. Generate some random data to imitate heights for men (0) and women (1):
+
+```{r}
+n = 10000
+set.seed(1)
+men = rnorm(n,176,7) #height in centimeters
+women = rnorm(n,162,7) #height in centimeters
+y = c(rep(0,n),rep(1,n))
+x = round(c(men,women))
+##mix it up
+ind = sample(seq(along=y))
+y = y[ind]
+x = x[ind]
+```
+
+###2. Using the data generated above, what is the E(Y|X = 176)?
+
+```{r}
+mean(y[x==176])
+```
+
+###3. Now make a plot of E(Y|X = x) for `x=seq(160,178)` using the data generated in exercise 1. If you are predicting female or male based on height and want your probability of success to be larger than 0.5, what is the largest height where you predict female?
+
+```{r}
+xs = seq(160,178)
+pr = sapply(xs, function(x0) mean(y[x==x0]))
+plot(xs, pr)
+abline(h = 0.5)
+abline(v = 168)
+```
+
+----
+
+###1. Generate the following data:
+
+```{r}
+n = 10000
+set.seed(1)
+men = rnorm(n,176,7) #height in centimeters
+women = rnorm(n,162,7) #height in centimeters
+y = c(rep(0,n),rep(1,n))
+x = round(c(men,women))
+##mix it up
+ind = sample(seq(along=y))
+y = y[ind]
+x = x[ind]
+```
+
+###Set the seed at 5, `set.seed(5)`, and take a random sample of 250 from:
+
+```{r}
+set.seed(5)
+N = 250
+ind = sample(length(y),N)
+Y = y[ind]
+X = x[ind]
+```
+
+###Use loess to estimate f(x) = E(Y|X = x) using the default parameters. What is the predicted f(168)?
+
+```{r}
+fit = loess(Y~X)
+predict(fit,newdata=data.frame(X=168))
+```
+
+The predicted f(168) is 0.5480233. 
+
+###2. The loess estimate above is a random variable. We can compute standard errors for it. Here we use Monte Carlo to demonstrate that it is a random variable. Use Monte Carlo simulation to estimate the standard error of your estimate of f(168). Set the seed to 5, `set.seed(5)`, and perform 10000 simulations and report the SE of the loess based estimate.
+
+```{r}
+set.seed(5)
+B = 10000
+N = 250
+xs = seq(160,178)
+plot(xs,xs,ylim=c(0,1),type="l")
+res = replicate(B,{
+  ind = sample(length(y),N)
+  Y = y[ind]
+  X = x[ind]
+  fit = loess(Y~X)
+  fitted=predict(fit,newdata=data.frame(X=xs))
+  lines(xs,fitted)
+  estimate = predict(fit,newdata=data.frame(X=168))
+  return(estimate)
+})
+
+popsd(res)
+```
+
+----
+
+###Load the following dataset:
+
+```{r}
+data(GSE5859Subset)
+```
+
+###And define the outcome and predictors. To make the problem more difficult, we will only consider autosomal genes:
+
+```{r}
+y = factor(sampleInfo$group)
+X = t(geneExpression)
+out = which(geneAnnotation$CHR%in%c("chrX","chrY"))
+X = X[,-out]
+```
+
+###1. Use the `createFold` function in the `caret` package, set the seed to 1, `set.seed(1)`, and create 10 folds. Question: What is the 2nd entry in the fold 3?
+
+```{r}
+set.seed(1)
+idx = createFolds(y, k=10)
+idx[[3]][2]
+```
+
+###2. We are going to use kNN. We are going to consider a smaller set of predictors by using filtering genes using t-tests. Specifically, we will perform a t-test and select the m genes with the smallest p-values. Let m = 8 and k = 5 and train kNN by leaving out the second fold `idx[[2]]`. How many mistakes do we make on the test set? Remember it is indispensable that you perform the t-test on the training data.
+
+```{r}
+m=8
+k=5
+ind = idx[[2]]
+pvals = rowttests(t(X[-ind,]),factor(y[-ind]))$p.val
+ind2 = order(pvals)[1:m]
+predict=knn(X[-ind,ind2],X[ind,ind2],y[-ind],k=k)
+sum(predict!=y[ind])
+```
+
+###3. Now run through all 5 folds. What is our error rate?
+
+```{r}
+m=8
+k=5
+result = sapply(idx,function(ind){
+  pvals = rowttests(t(X[-ind,]),factor(y[-ind]))$p.val
+  ind2 = order(pvals)[1:m]
+  predict=knn(X[-ind,ind2],X[ind,ind2],y[-ind],k=k)
+  sum(predict!=y[ind])
+})
+sum(result)/length(y)
+```
+
+###4. Now we are going to select the best values of k and m. Use the expand grid function to try out the following values:
+
+```{r}
+ms=2^c(1:11)
+ks=seq(1,9,2)
+params = expand.grid(k=ks,m=ms)
+```
+
+###Now use apply or a for-loop to obtain error rates for each of these pairs of parameters. Which pair of parameters minimizes the error rate?
+
+```{r}
+errors = apply(params,1,function(param){
+  k =  param[1]
+  m =  param[2]
+  result = sapply(idx,function(ind){
+    pvals = rowttests(t(X[-ind,]),factor(y[-ind]))$p.val
+    ind2 = order(pvals)[1:m]
+    predict=knn(X[-ind,ind2],X[ind,ind2],y[-ind],k=k)
+    sum(predict!=y[ind])
+  })
+  sum(result)/length(y)
+  })
+params[which.min(errors),]
+```
+
+###5. Repeat exercise 4, but now perform the t-test filtering before the cross validation. Note how this biases the entire result and gives us much lower estimated error rates.
+
+```{r}
+pvals = rowttests(t(X),factor(y))$p.val
+errors = apply(params,1,function(param){
+  k =  param[1]
+  m =  param[2]
+  result = sapply(idx,function(ind){
+    ind2 = order(pvals)[1:m]
+    predict=knn(X[-ind,ind2],X[ind,ind2],y[-ind],k=k)
+    sum(predict!=y[ind])
+  })
+  sum(result)/length(y)
+  })
+min(errors)
+```
+
+###6. Repeat exercise 3, but now, instead of `sampleInfo$group`, use
+
+```{r}
+y = factor(as.numeric(format( sampleInfo$date, "%m")=="06"))
+```
+
+###What is the minimum error rate now?
+
+```{r}
+errors = apply(params,1,function(param){
+  k =  param[1]
+  m =  param[2]
+  result = sapply(idx,function(ind){
+    pvals = rowttests(t(X[-ind,]),factor(y[-ind]))$p.val
+    ind2 = order(pvals)[1:m]
+    predict=knn(X[-ind,ind2],X[ind,ind2],y[-ind],k=k)
+    sum(predict!=y[ind])
+  })
+  sum(result)/length(y)
+  })
+min(errors)
+```
