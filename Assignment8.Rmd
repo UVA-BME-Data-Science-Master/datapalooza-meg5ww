@@ -175,6 +175,8 @@ abline(h = 0.5)
 abline(v = 168)
 ```
 
+168 is the largest height where you predict female.
+
 ----
 
 ###1. Generate the following data:
