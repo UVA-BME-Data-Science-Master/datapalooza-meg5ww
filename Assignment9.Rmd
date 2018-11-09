@@ -62,7 +62,7 @@ chisq.test(atab)$p.value
 
 The p-value is 9.139492e-22. 
 
-###This difference actually led to a lawsuit. Now notice that looking at the data by major, the differences disappear.How can this be? 
+###This difference actually led to a lawsuit. Now notice that looking at the data by major, the differences disappear. How can this be? 
 
 ```{r}
 index = admissions$Gender==1
@@ -226,6 +226,30 @@ sum(qval$qvalue < 0.05)
 
 560 genes have q-values < 0.05.
 
+###Notice the dramatic drop in the number of genes with q-value < 0.05 when we fix the year. However, the sample size is much smaller in this latest analysis which means we have less power:
+
+```{r}
+table(sampleInfo$ethnicity[index])
+```
+
+###9. To provide a more balanced comparison, we repeat the analysis, but now taking 3 random CEU samples from 2002. Repeat the analysis above, but comparing the ASN from 2005 to three random CEU samples from 2002. Set the seed at 3, set.seed(3). How many genes have q-values < 0.05?
+
+```{r}
+ethnicity = factor( sampleInfo$ethnicity)
+year = factor( format(sampleInfo$date,"%y") )
+indexASN = which(ethnicity%in% c("ASN") & year=="05")
+indexCEU = which(ethnicity%in% c("CEU") & year=="02")
+set.seed(3)
+indexCEU<-sample(indexCEU,3)
+index<-c(indexASN,indexCEU)
+ethnicity = droplevels(ethnicity[index])
+pval = rowttests(geneExpression[ ,index], ethnicity)$p.value
+qval = qvalue(pval)
+sum(qval$qvalue < 0.05)
+```
+
+3695 genes have q-values < 0.05.
+
 ----
 
 ###1. Using the functions `rowttests` and `qvalue` compare the two groups. Because this is a smaller dataset which decreases our power, we will use the more lenient FDR cut-off of 10%. How many gene have q-values less than 0.1?
@@ -268,9 +292,9 @@ index2 = geneAnnotation$CHR[qvals<0.1]%in%c("chrX")
 sum(index2)
 ```
 
-8 are on Y, 12 are on X. 
+8 are on chrY, 12 are on chrX. 
 
-###4. Now for the autosomal genes (not on chrX and chrY) for which q-value < 0.1, perform a t-test comparing samples processed in June to those processed in October. What proportion of these have p-values <0.05?
+###4. Now for the autosomal genes (not on chrX and chrY) for which q-value < 0.1, perform a t-test comparing samples processed in June to those processed in October. What proportion of these have p-values < 0.05?
 
 ```{r}
 pval = rowttests(geneExpression,sex)$p.value
@@ -282,7 +306,7 @@ pval = rowttests(geneExpression[index,], month)$p.value
 mean(pval<0.05)
 ```
 
-0.8717949 of these have p-values <0.05. 
+0.8717949 of these have p-values < 0.05. 
 
 ###5. The above result shows that the great majority of the autosomal genes show differences due to processing data. This provides further evidence that confounding is resulting in false positives. So we are going to try to model the month effect to better estimate the sex effect. We are going to use a linear model. Which of the following creates the appropriate design matrix?
 
@@ -293,7 +317,7 @@ X
 
 `X = model.matrix(~sex+month)` creates the appropriate design matrix.
 
-###6. . Now use the X defined above, to fit a regression model using lm for each gene. You can obtain p-values for estimated parameters using summary. Here is an example:
+###6. Now use the X defined above, to fit a regression model using `lm` for each gene. You can obtain p-values for estimated parameters using summary. Here is an example:
 
 ```{r}
 X = model.matrix(~sex+month)
@@ -303,7 +327,7 @@ fit = lm(y~X)
 summary(fit)$coef
 ```
 
-###How many of the q-values for the group comparison are now <0.1? Note the big drop from what we obtained without the correction.
+###How many of the q-values for the group comparison are now < 0.1? Note the big drop from what we obtained without the correction.
 
 ```{r}
 X = model.matrix(~sex+month)
@@ -316,7 +340,7 @@ qvals = qval$qvalues
 sum(qvals<0.1)
 ```
 
-17 of the q-values for the group comparison have q-values <0.1. 
+17 of the q-values for the group comparison have q-values < 0.1. 
 
 ###7. With this new list, what proportion of these are chrX and chrY? Notice the big improvement.
 
@@ -326,7 +350,6 @@ mean(index)
 ```
 
 0.8823529 of these are chrX and chrY.
-
 
 ###8. How many on Y or X?
 
@@ -339,7 +362,7 @@ sum(index2)
 
 6 on chrY, 9 on chrX. 
 
-###9. Now from the linear model above, extract the p-values related to the coefficient representing the October versus June differences using the same linear model. How many of the q-values for the month comparison are now <0.1? This approach is basically the approach implemented by Combat.
+###9. Now from the linear model above, extract the p-values related to the coefficient representing the October versus June differences using the same linear model. How many of the q-values for the month comparison are now < 0.1? This approach is basically the approach implemented by Combat.
 
 ```{r}
 X = model.matrix(~sex+month)
@@ -352,7 +375,7 @@ qvals = qval$qvalues
 sum(qvals<0.1)
 ```
 
-3170 of the q-values for the month comparison have q-values <0.1. 
+3170 of the q-values for the month comparison have q-values < 0.1. 
 
 ----
 
@@ -379,13 +402,21 @@ y = geneExpression - rowMeans(geneExpression)
 ```{r}
 sex = sampleInfo$group
 mypar(1,2)
+cols=colorRampPalette(rev(brewer.pal(11,"RdBu")))(100)
 cors = cor(y)
-image(cors)
+image(1:ncol(y),1:ncol(y),cors,col=cols,zlim=c(-1,1),
+       xaxt="n",xlab="",yaxt="n",ylab="")
+axis(2,1:ncol(y),sex,las=2)
+axis(1,1:ncol(y),sex,las=2)
 o = order(sampleInfo$date)
-image(cors[o,o])
+image(1:ncol(y),1:ncol(y),cors[o,o],col=cols,zlim=c(-1,1),
+      xaxt="n",xlab="",yaxt="n",ylab="")
+label = gsub("2005-","",sampleInfo$date[o])
+axis(2,1:ncol(y),label,las=2)
+axis(1,1:ncol(y),label,las=2)
 ```
 
-Sex seems to be creating structures as evidenced by the two clusters of highly correlated samples
+The fact that in the plot ordered by month we see two groups mainly driven by month, and within these we see subgroups driven by date, seems to suggest date more than month per se are the hidden factors.
 
 ###4. Based on the correlation plots above, we could argue that there are at least two hidden factors. Using PCA estimate these two factors. Specifically, apply the `svd` to `y` and use the first two PCs as estimates. Which command gives us these estimates?
 
@@ -399,7 +430,6 @@ var(as.vector(fit))/var(as.vector(y))
 ```
 
 `pcs = svd(y)$v[,1:2]` gives us these estimates.
-
 
 ###5. Plot each of the estimated factors ordered by date. Use color to denote month. The first factor is clearly related to date. Which of the following appear to be most different according to this factor?
 
@@ -458,7 +488,7 @@ plot(t(cors))
 which.max(abs(cors))
 ```
 
-The first PC most correlates with sex.. 
+The first PC most correlates with sex.
 
 ###10. What is this correlation (in absolute value)?
 
@@ -468,7 +498,7 @@ max(abs(cors))
 
 This correlation is 0.6236858.
 
-###11. Now instead of using month, which we have shown does not quite describe the batch, add the two estimated factors `s$v[,1:2]` to the linear model we used above. Apply this model to each gene and compute q-values for the sex difference. How many q-values <0.1 for the sex comparison?
+###11. Now instead of using month, which we have shown does not quite describe the batch, add the two estimated factors `s$v[,1:2]` to the linear model we used above. Apply this model to each gene and compute q-values for the sex difference. How many q-values < 0.1 for the sex comparison?
 
 ```{r}
 X <- model.matrix(~sex+s$v[,1:2])
@@ -482,7 +512,7 @@ qvals = qval$qvalues
 sum(qvals<0.1)
 ```
 
-There are 14 q-values <0.1 for the sex comparison.
+There are 14 q-values < 0.1 for the sex comparison.
 
 ###12. What proportion of the genes are on chromosomes X and Y?
 
@@ -516,8 +546,7 @@ head(svafit$sv)
 
 ```{r}
 for(i in 1:ncol(svafit$sv)){
-print( cor(s$v[,i],svafit$sv[,i]) )
-}
+print( cor(s$v[,i],svafit$sv[,i]) )}
 ```
 
 ###Now fit a linear model to each gene that instead of month includes these factors in the model. Use the `qvalue` function. How many genes have q-value < 0.1?
