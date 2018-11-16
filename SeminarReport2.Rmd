@@ -22,13 +22,13 @@ output: html_document
 Protein phosphorylation acts as a regulatory switch. There are more than 500 human protein kinases. The Turk lab is interested in understanding phosphorylation events in eukaryotic cells, investigating which kinases are catalyzing these phosphorylation events as well as the functional relevance of these kinases. In particular, the Turk lab is focused on protein kinase substrate targeting. Many of these types of interactions are mediated by short linear sequences encoded in the substrate domain. The Turk lab seeks to identify sequence motifs that are targeted by different kinases.
 
 ##Short Overview: 
-Although many Ser/Thr kinases have a phosphoacceptor residue preference, there is no obvious overall sequence distinction between kinases with Ser selectivity and kinases with Thr selectivity. The DFG+1 residue, proximal to the phosphoacceptor residue, structurally determines Ser/Thr specificity in the STE20 family of kinases. PAK4 and MST4, both members of the STE20 family of kinases, have distinct phosphorylation site motifs, with PAK4 having a preference for basic residues after Thr and MST4 de-selecting for basic residues after Thr. PAK4 that has been reprogrammed to have an MST motif can compensate for the activity of MST1/2 in the Hippo pathway. 
+Although many serine/threonine (Ser/Thr) kinases have a phosphoacceptor residue preference, there is no obvious overall sequence distinction between Ser/Thr kinases with Ser selectivity and Ser/Thr kinases with Thr selectivity. The DFG+1 residue, proximal to the phosphoacceptor residue, structurally determines Ser/Thr specificity in STE20 kinases. The kinases PAK4 and MST4 have distinct phosphorylation site motifs, with PAK4 having a preference for basic residues after Thr and MST4 de-selecting for basic residues after Thr. PAK4 that has been reprogrammed to have an MST motif can compensate for the activity of MSTs in the Hippo pathway. 
 
 ##Main Points: 
 
 Around 2% of eukaryotic genes code for protein kinases. There are >500 kinases in the human kinome. 
 
-The Turk lab uses a peptide array approach recently adapted to microarray to study phosphorylation site motifs. In a peptide array, there is a series of peptide mixtures in a multi-well plate. The peptide mixtures are scanned through 9 residues at a time, and the residues performing phosphorylation can be identified by spots in the array. 
+The Turk lab uses a peptide array approach recently adapted to microarrays to study phosphorylation site motifs. In a peptide array, there is a series of peptide mixtures in a multi-well plate. The peptide mixtures are scanned through 9 residues at a time, and the residues performing phosphorylation can be identified by spots in the array. 
 
 A spot array can be considered a quantitative matrix of values, and can be represented with a heatmap. While the spots identify residues that are performing phosphorylation, negative selections are also informative. With negative selection, there will be a row with many spots but ~1-2 residues that are de-selected. 
 
@@ -40,9 +40,7 @@ Ser selectivity is more common than Thr selectivity (~85% of phosphorylation sit
 
 In a collaboration with Philip Kim from the University of Toronto, the Turk lab has developed computational methods for the identification of specificity-determining residues to see if there is a particular residue that is correlated with Ser/Thr specificity. They have found that the kinase residue proximal to the phosphoacceptor (referred to as the DFG+1 residue) correlates with Ser/Thr specificity. This residue is the structural basis for this selectivity. Large hydrophobic residues proximal to the phosphoacceptor give Ser selectivity. 
 
-The Turk lab has investigated Ser/Thr specificity using the mammalian sterile 20 (STE20) family of kinases. Most of these kinases prefer Thr, and have a valine (Val) residue at DFG+1. The Turk lab has made DFG+1 mutants in a large number of these kinases.
-
-The Turk lab has found that the structural basis for DFG+1 control of phosphoacceptor specificity is an extra methyl with Thr pointed at DFG+1, which promotes a conformation better suited to phosphate transfer. 
+The Turk lab has investigated Ser/Thr specificity using the mammalian sterile 20 (STE20) family of kinases. Most of these kinases prefer Thr, and have a valine (Val) residue at DFG+1. The Turk lab has made DFG+1 mutants in a large number of these kinases. The Turk lab has found that the structural basis for DFG+1 control of phosphoacceptor specificity is an extra methyl with Thr pointed at DFG+1.
 
 PAK4 and MST4, both members of the STE20 family of kinases, have distinct phosphorylation site motifs, identified by screening large numbers of kinases using peptide arrays and doing comparative sequence analysis. 
 
@@ -60,6 +58,6 @@ Structural features of STE20 kinases are important for recognition of specific p
 ##Questions for the Speaker:
 1) What role do oncogenic mutations play in phosphorylation signaling? How do oncogenic mutations to STE20 kinases affect phosphorylation events? 
 
-2) Mass spectrometry can pick up phosphorylation events with very low stoichiometries, making the >500 kinases in the human kinome somewhat of an overestimate in terms of kinases that are functionally significant. What percentage of phosphorylation events have high stoichiometry? 
+2) Mass spectrometry can pick up phosphorylation events with very low stoichiometry, making the >500 kinases in the human kinome somewhat of an overestimate in terms of kinases that are functionally significant. What percentage of phosphorylation events has high stoichiometry? 
 
 3) What are your thoughts regarding the functional significance of the "dark" phosphoproteome (i.e. phosphorylation not picked up by mass spectrometry, such as His and Lys phosphorylation)?
