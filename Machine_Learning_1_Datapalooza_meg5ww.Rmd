@@ -1,0 +1,111 @@
+---
+title: "Machine Learning 1, Datapalooza"
+author: "Monika Grabowska"
+date: "11/8/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+I attended the Machine Learning 1: "Using Machine Learning to Predict Human Activity from Smart Phones Data in R" skills session at Datapalooza. The session was led by Abigail Flower, a professor in the Department of Systems and Information Engineering at UVA, who also teaches in the Data Science Institute. 
+
+In the skills session, we explored a dataset with smartphone data and compared the performance of two different machine learning algorithms, k-nearest neighbors and random forest, at classifying human activity using data collected by smartphones. The dataset was originally from a Kaggle competition (a popular data science competition), and contained information about a person's motion. The features in the data included accelerometer and gyroscope 3-axial raw signals (tAcc-XYZ and tGyro-XYZ), body and gravity acceleration signals (tBodyAcc-XYZ and tGravityAcc-XYZ), Jerk signals (tBodyAccJerk-XYZ and tBodyGyroJerk-XYZ), and the magnitude of these three-dimensional signals (tBodyAccMag, tGravityAccMag, tBodyAccJerkMag, tBodyGyroMag, tBodyGyroJerkMag). The outcome variable was the particular type of activity that the person was performing while the motion data was being collected, and was multi-class rather than binary. The possible outcome variables were walking (1), walking upstairs (2), walking downstairs (3), sitting (4), standing (5), and laying (6). 
+
+
+```{r}
+# load libraries 
+library(randomForest)
+library(gmodels)
+library(neuralnet)
+library(RSNNS)
+library(Rcpp)
+library(lattice)
+library(ggplot2)
+library(caret)
+library(knitr)
+
+# set working directory and load the data.
+setwd("/Users/monikagrabowska/Documents")
+ad <- read.csv("activities_data.csv")
+#head(ad)
+ad <- ad[,-1]
+head(ad)
+tail(ad)
+
+summary(ad$label) # label is our outcome var
+ad$label <- as.factor(ad$label)
+```
+
+Before creating any models, we needed to partition the data into training and test sets. The training set is used to build the model, while the test set will be used to evaluate our performance and judge how successfully we were able to classify the various types of human activity. We randomly picked (without replacement) 7500 rows from the dataset to be our training set. The dataset contained 10299 rows, so around ~73 percent of the data was used in the training set. 
+
+
+```{r}
+# coerce the ad object to be a dataframe.
+ad <- as.data.frame(ad, row.names = NULL)
+
+# create training and test sets
+index <- sample(nrow(ad), 7500) # randomly pick (w/out replacement) 7500 rows
+train_set <- ad[index,] # index becomes rows for train set (want 75-80% of the data in training set)
+test_set <- ad[-index,] # everything not in index becomes rows for test set
+summary(test_set$label) # proof that have randomized things (i.e. sanity check)
+```
+
+Since this was a great deal of data for our models to process on a standard laptop, we made smaller subsets for the purposes of practicing.
+
+```{r}
+practice_train_set <- train_set[1:3500,] # train set already randomized so don't need to do again
+practice_test_set <- test_set[1:1500,]
+```
+
+The first model we used was k-nearest neighbors (KNN). This algorithm determines the closest in feature space to a new test point, and labels the new test point accordingly. kNN is useful when data is labeled, data is noise-free, and the dataset is small. KNN is a lazy learner in that it is not actually training and building something; it does not learn a discriminative function from a dataset, but rather "memorizes" the training set. In KNN, k describes the number of closest training examples in the feature space. k cannot be an even number, because if the closest training examples in the feature space are divided evenly into 2 groups (i.e. k = 8 and the closest training examples in the feature space are 4 red squares and 4 red triangles), you will not have a tie breaker. k is not a parameters (since it is not tunable), but rather is a hyperparameter. 
+
+```{r}
+set.seed(123) # way of randomizing, allows you to recapitulate that randomization
+model_knn <- train(label~ ., data = practice_train_set, 
+                       method = "knn", 
+                       tuneLength = 5)
+# label~. means label is dependent on all features (563)
+# tuneLength = 1 - here the k that is used is 5
+# tuneLength will pick the best k -  runs n number of times with different k's
+
+# make predictions based on this model
+p_knn <- predict(model_knn,practice_test_set)
+
+# check performance
+confusionMatrix(p_knn,practice_test_set$label)
+#model_knn
+```
+
+In the confusion matrix, we want large numbers in the diagonal (since these are the correct predictions). 
+
+The second model that we used is random forest. In a decision tree, the thing that discriminates most is at the top of the tree. The random forest algorithm puts a bunch of decision trees together, but in order to save time, uses a randomly chosen subset of the features (typically uses the square root of the number of features). The trees are chosen with replacement (i.e. bootstrapped). One advantage of random forest is that some of the quieter nodes may get to speak.
+
+```{r}
+model_rf <- randomForest(label ~ ., practice_train_set)
+p_rf <- predict(model_rf,practice_test_set)
+confusionMatrix(p_rf,practice_test_set$label)
+```
+
+Some algorithms behave badly in many dimensions, known in machine learning as the "curse of dimensionality." In the dataset, we have a tremendously large set of features, and it is difficult to believe that all of them are highly important for classification, motivating feature selection using the `varImp` (variable importance) function in R. In our random forest model, we can use `varImp` to show us what the most important discriminating features were and provide justification for choosing a reduced set of features. 
+
+```{r}
+v <- varImp(model_rf)
+varImpPlot(model_rf)
+```
+
+We used an arbitrary threshold of 20 to choose a strong subset of features, and then make new test and train sets 
+
+```{r}
+fs <- which(v$Overall>=20)
+fs <- fs+1
+fs <- c(1,fs)
+train_set <- ad[index,fs]
+test_set <- ad[-index,fs] # now dimensions of test set = 29 features 
+
+# evaluate performance with reduced feature set - performance still good though (very helpful for knn - knn can get distracted by less important features - if use these features with knn will get a lot better results)
+model_rf <- randomForest(label ~ ., train_set)
+p_rf <- predict(model_rf,test_set)
+confusionMatrix(p_rf,test_set$label)
+```
